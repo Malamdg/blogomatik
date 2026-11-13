@@ -6,7 +6,7 @@ Le modèle fourni contient des textes et des images de remplacement. Vous pouvez
 
 ## Utilisation
 
-1. Téléchargez le fichier `index.html` d’une release, ou utilisez `out/index.html` après avoir généré le projet, puis ouvrez-le dans un navigateur récent.
+1. Téléchargez le fichier `index.html` depuis la dernière release : [Releases](https://github.com/Malamdg/blogomatik/releases), ou utilisez `out/index.html` après avoir généré le projet, puis ouvrez-le dans un navigateur récent.
 2. En mode édition, cliquez sur les textes du blog pour les modifier.
 3. Utilisez les commandes des cases et des livres pour importer vos images et modifier les mentions de stock.
 4. Réglez la police, la taille du texte et les couleurs dans la partie **Apparence**.
