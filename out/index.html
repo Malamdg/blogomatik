@@ -1354,6 +1354,7 @@
       .sheet #site {
         box-shadow: 9px 9px 0 var(--theme-shadow, #242424) !important;
       }
+
     </style>
   </head>
   <body>
@@ -1701,144 +1702,127 @@
     </div>
 
     <script id="blog-configurator">
-      (() => {
-        const storageKey = (name) => "blog-configurator:" + name + ":" + location.pathname;
-        function readSetting(name) {
-          try {
-            return localStorage.getItem(storageKey(name));
-          } catch (error) {
-            return null;
-          }
-        }
-        function readColors() {
-          try {
-            const colors = JSON.parse(readSetting("colors"));
-            return colors && typeof colors === "object" && !Array.isArray(colors) ? colors : null;
-          } catch (error) {
-            return null;
-          }
-        }
-        const site = document.getElementById("site"),
-          editBtn = document.getElementById("editBtn"),
-          saveBtn = document.getElementById("saveBtn"),
-          imageInput = document.getElementById("imageInput");
-        let editing = false,
-          target = null;
-        const initial = site.innerHTML;
-        const embedded = window.__BLOG_CONFIG__ || null;
-        const fontSelect = document.getElementById("fontSelect");
-        const fonts = {
-          dm: "'DM Sans',Arial,sans-serif",
-          comic: "'Comic Sans MS','Comic Sans',cursive",
-          marker: "'Permanent Marker','Comic Sans MS',cursive",
-          arial: "Arial,Helvetica,sans-serif",
-          georgia: "Georgia,serif",
-          verdana: "Verdana,Geneva,sans-serif",
-          courier: "'Courier New',monospace",
-        };
-        function applyFont(key) {
-          const chosen = fonts[key] ? key : "dm";
-          document.documentElement.style.setProperty("--global-font", fonts[chosen]);
-          fontSelect.value = chosen;
-          try {
-            localStorage.setItem(storageKey("font"), chosen);
-          } catch (e) {}
-        }
-        fontSelect.addEventListener("change", () => applyFont(fontSelect.value));
-        applyFont(readSetting("font") || embedded?.font || "dm");
-        function toast(t) {
-          const e = document.getElementById("toast");
-          e.textContent = t;
-          e.style.display = "block";
-          setTimeout(() => (e.style.display = "none"), 2500);
-        }
-        function mode(on) {
-          editing = on;
-          site.classList.toggle("editing", on);
-          site
-            .querySelectorAll(".editable")
-            .forEach((e) => (e.contentEditable = on ? "true" : "false"));
-          editBtn.textContent = on ? "✓ Terminer l’édition" : "✏️ Activer l’édition";
-          saveBtn.textContent = "💾 Enregistrer";
-        }
-        editBtn.onclick = () => mode(!editing);
-        function snapshot() {
-          const clone = site.cloneNode(true);
-          clone.classList.remove("editing");
-          clone
-            .querySelectorAll("[contenteditable]")
-            .forEach((e) => e.removeAttribute("contenteditable"));
-          return clone.innerHTML;
-        }
-        function store() {
-          try {
-            localStorage.setItem(storageKey("content"), snapshot());
-            toast("Modifications enregistrées dans ce navigateur.");
-          } catch (e) {
-            toast(
-              "Enregistrement local impossible. Exportez le HTML pour conserver vos modifications.",
-            );
-          }
-        }
-        function exportHTML() {
-          const clone = document.documentElement.cloneNode(true);
-          const copySite = clone.querySelector("#site");
-          copySite.innerHTML = snapshot();
-          copySite.classList.remove("editing");
-          clone.querySelector("#fontSelect").value = fontSelect.value;
-          const config = {
-            content: snapshot(),
-            font: fontSelect.value,
-            header: document.getElementById("headerColor").value,
-            band: document.getElementById("bandColor").value,
-            paper: document.getElementById("paperColor").value,
-            size: document.getElementById("textSize").value,
-          };
-          clone.querySelectorAll("script[data-blog-config]").forEach((script) => script.remove());
-          const boot = clone.ownerDocument.createElement("script");
-          boot.dataset.blogConfig = "";
-          boot.textContent =
-            "window.__BLOG_CONFIG__=" + JSON.stringify(config).replace(/</g, "\\u003c") + ";";
-          clone.querySelector("head").appendChild(boot);
-          clone.querySelectorAll(".editable").forEach((e) => e.removeAttribute("contenteditable"));
-          const html = "<!DOCTYPE html>\n" + clone.outerHTML;
-          const blob = new Blob([html], { type: "text/html;charset=utf-8" }),
-            url = URL.createObjectURL(blob),
-            a = document.createElement("a");
-          a.href = url;
-          a.download = "mon-blog.html";
-          a.click();
-          setTimeout(() => URL.revokeObjectURL(url), 2000);
-          toast("Fichier HTML exporté.");
-        }
-        document.getElementById("pdfBtn").onclick = () => {
-          if (document.activeElement?.blur) document.activeElement.blur();
-          const sizes = {
-            A1: [594, 841],
-            A2: [420, 594],
-            A3: [297, 420],
-            A4: [210, 297],
-            A5: [148, 210],
-          };
-          const format = document.getElementById("pdfFormat").value;
-          const [pw, ph] = sizes[format] || sizes.A4;
-          const copy = site.cloneNode(true);
-          copy.classList.remove("editing");
-          copy
-            .querySelectorAll("[contenteditable]")
-            .forEach((el) => el.removeAttribute("contenteditable"));
-          copy
-            .querySelectorAll(
-              ".book-tools,.edit-art,.add-book,.stock-editor,.note,.comic-caption-edit",
-            )
-            .forEach((el) => el.remove());
-          // Keep the visual theme, but isolate paper layout from legacy print and mobile rules.
-          const css = [...document.querySelectorAll("style")]
-            .flatMap((el) => [...el.sheet.cssRules])
-            .filter((rule) => rule.type !== CSSRule.MEDIA_RULE && rule.type !== CSSRule.PAGE_RULE)
-            .map((rule) => rule.cssText)
-            .join("\n");
-          const printCSS = `
+(() => {
+  // src/js/configurator.js
+  (() => {
+    const storageKey = (name) => "blog-configurator:" + name + ":" + location.pathname;
+    function readSetting(name) {
+      try {
+        return localStorage.getItem(storageKey(name));
+      } catch (error) {
+        return null;
+      }
+    }
+    function readColors() {
+      try {
+        const colors2 = JSON.parse(readSetting("colors"));
+        return colors2 && typeof colors2 === "object" && !Array.isArray(colors2) ? colors2 : null;
+      } catch (error) {
+        return null;
+      }
+    }
+    const site = document.getElementById("site"), editBtn = document.getElementById("editBtn"), saveBtn = document.getElementById("saveBtn"), imageInput = document.getElementById("imageInput");
+    let editing = false, target = null;
+    const initial = site.innerHTML;
+    const embedded = window.__BLOG_CONFIG__ || null;
+    const fontSelect = document.getElementById("fontSelect");
+    const fonts = {
+      dm: "'DM Sans',Arial,sans-serif",
+      comic: "'Comic Sans MS','Comic Sans',cursive",
+      marker: "'Permanent Marker','Comic Sans MS',cursive",
+      arial: "Arial,Helvetica,sans-serif",
+      georgia: "Georgia,serif",
+      verdana: "Verdana,Geneva,sans-serif",
+      courier: "'Courier New',monospace"
+    };
+    function applyFont(key) {
+      const chosen = fonts[key] ? key : "dm";
+      document.documentElement.style.setProperty("--global-font", fonts[chosen]);
+      fontSelect.value = chosen;
+      try {
+        localStorage.setItem(storageKey("font"), chosen);
+      } catch (e) {
+      }
+    }
+    fontSelect.addEventListener("change", () => applyFont(fontSelect.value));
+    applyFont(readSetting("font") || embedded?.font || "dm");
+    function toast(t) {
+      const e = document.getElementById("toast");
+      e.textContent = t;
+      e.style.display = "block";
+      setTimeout(() => e.style.display = "none", 2500);
+    }
+    function mode(on) {
+      editing = on;
+      site.classList.toggle("editing", on);
+      site.querySelectorAll(".editable").forEach((e) => e.contentEditable = on ? "true" : "false");
+      editBtn.textContent = on ? "✓ Terminer l’édition" : "✏️ Activer l’édition";
+      saveBtn.textContent = "💾 Enregistrer";
+    }
+    editBtn.onclick = () => mode(!editing);
+    function snapshot() {
+      const clone = site.cloneNode(true);
+      clone.classList.remove("editing");
+      clone.querySelectorAll("[contenteditable]").forEach((e) => e.removeAttribute("contenteditable"));
+      return clone.innerHTML;
+    }
+    function store() {
+      try {
+        localStorage.setItem(storageKey("content"), snapshot());
+        toast("Modifications enregistrées dans ce navigateur.");
+      } catch (e) {
+        toast(
+          "Enregistrement local impossible. Exportez le HTML pour conserver vos modifications."
+        );
+      }
+    }
+    function exportHTML() {
+      const clone = document.documentElement.cloneNode(true);
+      const copySite = clone.querySelector("#site");
+      copySite.innerHTML = snapshot();
+      copySite.classList.remove("editing");
+      clone.querySelector("#fontSelect").value = fontSelect.value;
+      const config = {
+        content: snapshot(),
+        font: fontSelect.value,
+        header: document.getElementById("headerColor").value,
+        band: document.getElementById("bandColor").value,
+        paper: document.getElementById("paperColor").value,
+        size: document.getElementById("textSize").value
+      };
+      clone.querySelectorAll("script[data-blog-config]").forEach((script) => script.remove());
+      const boot = clone.ownerDocument.createElement("script");
+      boot.dataset.blogConfig = "";
+      boot.textContent = "window.__BLOG_CONFIG__=" + JSON.stringify(config).replace(/</g, "\\u003c") + ";";
+      clone.querySelector("head").appendChild(boot);
+      clone.querySelectorAll(".editable").forEach((e) => e.removeAttribute("contenteditable"));
+      const html = "<!DOCTYPE html>\n" + clone.outerHTML;
+      const blob = new Blob([html], { type: "text/html;charset=utf-8" }), url = URL.createObjectURL(blob), a = document.createElement("a");
+      a.href = url;
+      a.download = "mon-blog.html";
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 2e3);
+      toast("Fichier HTML exporté.");
+    }
+    document.getElementById("pdfBtn").onclick = () => {
+      if (document.activeElement?.blur) document.activeElement.blur();
+      const sizes = {
+        A1: [594, 841],
+        A2: [420, 594],
+        A3: [297, 420],
+        A4: [210, 297],
+        A5: [148, 210]
+      };
+      const format = document.getElementById("pdfFormat").value;
+      const [pw, ph] = sizes[format] || sizes.A4;
+      const copy = site.cloneNode(true);
+      copy.classList.remove("editing");
+      copy.querySelectorAll("[contenteditable]").forEach((el) => el.removeAttribute("contenteditable"));
+      copy.querySelectorAll(
+        ".book-tools,.edit-art,.add-book,.stock-editor,.note,.comic-caption-edit"
+      ).forEach((el) => el.remove());
+      const css = [...document.querySelectorAll("style")].flatMap((el) => [...el.sheet.cssRules]).filter((rule) => rule.type !== CSSRule.MEDIA_RULE && rule.type !== CSSRule.PAGE_RULE).map((rule) => rule.cssText).join("\n");
+      const printCSS = `
   @page{size:${pw}mm ${ph}mm;margin:0}
   html,body{margin:0!important;padding:0!important;background:white!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   .sheet{width:${pw}mm;height:${ph}mm;position:relative;overflow:hidden;background:white;break-after:avoid;page-break-after:avoid}
@@ -1884,11 +1868,10 @@
   .sheet .site{font-size:var(--base-size,100%)!important}
   @media print{.sheet{width:${pw}mm!important;height:${ph}mm!important}}
   `;
-          const cfg = getComputedStyle(site);
-          const font =
-            cfg.getPropertyValue("--global-font") || getComputedStyle(document.body).fontFamily;
-          const size = cfg.getPropertyValue("--base-size") || "100%";
-          const js = `
+      const cfg = getComputedStyle(site);
+      const font = cfg.getPropertyValue("--global-font") || getComputedStyle(document.body).fontFamily;
+      const size = cfg.getPropertyValue("--base-size") || "100%";
+      const js = `
   function fit(){
     const sheet=document.querySelector('.sheet'),wrap=sheet.querySelector('.wrap');
     wrap.style.transform='none';
@@ -1920,426 +1903,407 @@
   });
   window.addEventListener('beforeprint',fit);
   `;
-          const html =
-            '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Blog — ' +
-            format +
-            " portrait</title><style>" +
-            css +
-            "\n:root{--global-font:" +
-            font +
-            ";--base-size:" +
-            size +
-            "}" +
-            printCSS +
-            '</style></head><body><div class="sheet"><div class="wrap">' +
-            copy.outerHTML +
-            "</div></div><scr" +
-            "ipt>" +
-            js +
-            "</scr" +
-            "ipt></body></html>";
-          const win = window.open("", "_blank");
-          if (!win) {
-            toast("Autorise les fenêtres pop-up pour exporter en PDF.");
-            return;
-          }
-          win.document.open();
-          win.document.write(html);
-          win.document.close();
-          toast("Aperçu ouvert : choisis « Enregistrer au format PDF ».");
-        };
-        saveBtn.onclick = store;
-        document.getElementById("exportBtn").onclick = exportHTML;
-        document.getElementById("resetBtn").onclick = () => {
-          if (!confirm("Remettre la maquette initiale ?")) return;
-          try {
-            ["content", "font", "colors"].forEach((name) =>
-              localStorage.removeItem(storageKey(name)),
-            );
-          } catch (error) {}
-          applyFont("dm");
-          site.innerHTML = initial;
-          ensureComingSoonLast();
-          applyColors({ header: "#ffda52", band: "#f9cbd0", paper: "#fffaf0", size: 100 });
-          mode(true);
-          toast("Maquette réinitialisée.");
-        };
-        try {
-          const saved = readSetting("content");
-          if (saved) site.innerHTML = saved;
-          else if (embedded?.content) site.innerHTML = embedded.content;
-        } catch (e) {}
-        mode(true);
-        function applyColors(c) {
-          const fields = {
-            header: "headerColor",
-            band: "bandColor",
-            paper: "paperColor",
-            size: "textSize",
-          };
-          for (const [k, id] of Object.entries(fields)) {
-            if (c[k] !== undefined) document.getElementById(id).value = c[k];
-          }
-          site.querySelector(".masthead").style.background =
-            document.getElementById("headerColor").value;
-          site.querySelector(".selection").style.background =
-            document.getElementById("bandColor").value;
-          site.style.background = document.getElementById("paperColor").value;
-          site.style.setProperty("--base-size", document.getElementById("textSize").value + "%");
-          document.getElementById("sizeOutput").textContent =
-            document.getElementById("textSize").value + " %";
-        }
-        const colors = readColors() || embedded || {};
-        applyColors(colors);
-        ["headerColor", "bandColor", "paperColor", "textSize"].forEach((id) =>
-          document.getElementById(id).addEventListener("input", () => {
-            applyColors({});
-            try {
-              localStorage.setItem(
-                storageKey("colors"),
-                JSON.stringify({
-                  header: document.getElementById("headerColor").value,
-                  band: document.getElementById("bandColor").value,
-                  paper: document.getElementById("paperColor").value,
-                  size: document.getElementById("textSize").value,
-                }),
-              );
-            } catch (e) {}
-          }),
+      const html = '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Blog — ' + format + " portrait</title><style>" + css + "\n:root{--global-font:" + font + ";--base-size:" + size + "}" + printCSS + '</style></head><body><div class="sheet"><div class="wrap">' + copy.outerHTML + "</div></div><script>" + js + "<\/script></body></html>";
+      const win = window.open("", "_blank");
+      if (!win) {
+        toast("Autorise les fenêtres pop-up pour exporter en PDF.");
+        return;
+      }
+      win.document.open();
+      win.document.write(html);
+      win.document.close();
+      toast("Aperçu ouvert : choisis « Enregistrer au format PDF ».");
+    };
+    saveBtn.onclick = store;
+    document.getElementById("exportBtn").onclick = exportHTML;
+    document.getElementById("resetBtn").onclick = () => {
+      if (!confirm("Remettre la maquette initiale ?")) return;
+      try {
+        ["content", "font", "colors"].forEach(
+          (name) => localStorage.removeItem(storageKey(name))
         );
-        function ensureComingSoonLast() {
-          const books = document.getElementById("books");
-          const coming = books?.querySelector(".coming-soon");
-          if (coming && coming !== books.lastElementChild) books.append(coming);
-        }
-        ensureComingSoonLast();
-        site.addEventListener("click", (e) => {
-          if (!editing) return;
-          const change = e.target.closest(".edit-art,.upload-cover");
-          if (change) {
-            target =
-              change.closest(".panel-art") || change.closest(".book")?.querySelector(".cover");
-            if (!target) {
-              toast("Emplacement image introuvable.");
-              return;
-            }
-            imageInput.value = "";
-            imageInput.click();
-            return;
-          }
-          const stockToggle = e.target.closest(".toggle-stock");
-          if (stockToggle) {
-            const mask = stockToggle.closest(".book").querySelector(".stock-mask");
-            if (mask) {
-              mask.hidden = !mask.hidden;
-              toast(mask.hidden ? "Masque retiré" : "Masque rupture affiché");
-            }
-            return;
-          }
-          const stockEdit = e.target.closest(".edit-stock");
-          if (stockEdit) {
-            const book = stockEdit.closest(".book"),
-              mask = book.querySelector(".stock-mask"),
-              field = book.querySelector(".stock-editor");
-            if (mask && field) {
-              field.value = mask.textContent;
-              field.classList.toggle("open");
-              if (field.classList.contains("open")) {
-                field.focus();
-                field.select();
-              }
-            }
-            return;
-          }
-          const coverClick = e.target.closest(".cover");
-          if (coverClick && !coverClick.closest(".coming-soon")) {
-            target = coverClick;
-            imageInput.click();
-            return;
-          }
-          const link = e.target.closest(".edit-link");
-          if (link) {
-            const a = link.closest(".book").querySelector("[data-link]"),
-              v = prompt(
-                "URL du livre (https://...)",
-                a.getAttribute("href") === "#" ? "" : a.getAttribute("href"),
-              );
-            if (v !== null) {
-              if (v.trim() && !/^https?:\/\//i.test(v.trim()))
-                return alert("Utilise un lien commençant par https:// ou http://");
-              a.href = v.trim() || "#";
-              a.textContent = v.trim() ? "Voir le livre ↗" : "Lien vers le livre";
-            }
-            return;
-          }
-          const remove = e.target.closest(".remove-book");
-          if (remove) {
-            e.preventDefault();
-            e.stopPropagation();
-            const book = remove.closest(".book");
-            if (book && !book.classList.contains("coming-soon")) {
-              book.remove();
-              ensureComingSoonLast();
-              toast("Livre retiré.");
-            }
-            return;
-          }
-        });
-        site.addEventListener("input", (e) => {
-          if (e.target.matches(".stock-editor")) {
-            const mask = e.target.closest(".book").querySelector(".stock-mask");
-            if (mask) {
-              mask.textContent = e.target.value || "RUPTURE DE STOCK";
-              mask.hidden = false;
-            }
-          }
-        });
-        imageInput.onchange = () => {
-          const file = imageInput.files[0];
-          if (!file || !target) return;
-          if (!file.type.startsWith("image/")) {
-            alert("Choisis une image (JPG, PNG, WebP ou GIF).");
-            return;
-          }
-          const reader = new FileReader();
-          reader.onload = () => {
-            target.querySelectorAll("img,.placeholder,.fallback").forEach((e) => e.remove());
-            const img = document.createElement("img");
-            img.src = reader.result;
-            img.alt = "Illustration personnalisée";
-            target.prepend(img);
-            toast("Image ajoutée !");
-            imageInput.value = "";
-          };
-          reader.onerror = () => toast("Impossible de lire cette image.");
-          reader.readAsDataURL(file);
-        };
-        document.getElementById("addBook").onclick = () => {
-          if (!editing) return;
-          const b = document.createElement("div");
-          b.className = "book";
-          b.innerHTML =
-            '<div class="cover"><span class="fallback editable" contenteditable="true">NOUVELLE<br>LECTURE</span><span class="stock-mask" hidden>RUPTURE DE STOCK</span></div><h3 class="editable" contenteditable="true">Titre du livre</h3><a href="#" data-link>Lien vers le livre</a><div class="book-tools"><button class="mini upload-cover" type="button">📷 Image</button><button class="mini edit-link" type="button">🔗 Lien</button><button class="mini toggle-stock" type="button">🚫 Rupture : ON/OFF</button><button class="mini edit-stock" type="button">✍️ Modifier le texte de rupture</button><input class="stock-editor" type="text" aria-label="Texte de rupture de stock" placeholder="Ex. ÉPUISÉ"><button class="mini remove-book" type="button">✕ Retirer</button></div>';
-          const books = document.getElementById("books");
-          const coming = books.querySelector(".coming-soon");
-          if (coming) books.insertBefore(b, coming);
-          else books.append(b);
-          ensureComingSoonLast();
-          toast("Livre ajouté avant « Plus à venir ».");
-        };
-        document.addEventListener("click", (e) => {
-          const a = e.target.closest("a[data-link]");
-          if (a && a.getAttribute("href") === "#") e.preventDefault();
-        });
-      })();
-    </script>
-    <script id="comic-caption-editor">
-      (() => {
-        const site = document.getElementById("site");
-        if (!site) return;
-        function refresh() {
-          site.querySelectorAll(".comic-grid .panel").forEach((panel, index) => {
-            const caption = panel.querySelector(".panel-caption");
-            if (!caption) return;
-            panel.classList.toggle("caption-empty", !caption.textContent.trim());
-            if (!panel.querySelector(".comic-caption-edit")) {
-              const button = document.createElement("button");
-              button.type = "button";
-              button.className = "comic-caption-edit";
-              button.textContent = "✏️ Modifier le texte";
-              button.setAttribute("aria-label", "Modifier le texte de la case " + (index + 1));
-              panel.appendChild(button);
-            }
-          });
-        }
-        site.addEventListener("click", (event) => {
-          const button = event.target.closest(".comic-caption-edit");
-          if (!button || !site.classList.contains("editing")) return;
-          event.preventDefault();
-          const caption = button.closest(".panel").querySelector(".panel-caption");
-          const answer = prompt(
-            "Texte de cette case (laisser vide pour agrandir l’image) :",
-            caption.textContent,
+      } catch (error) {
+      }
+      applyFont("dm");
+      site.innerHTML = initial;
+      ensureComingSoonLast();
+      applyColors({ header: "#ffda52", band: "#f9cbd0", paper: "#fffaf0", size: 100 });
+      mode(true);
+      toast("Maquette réinitialisée.");
+    };
+    try {
+      const saved = readSetting("content");
+      if (saved) site.innerHTML = saved;
+      else if (embedded?.content) site.innerHTML = embedded.content;
+    } catch (e) {
+    }
+    mode(true);
+    function applyColors(c) {
+      const fields = {
+        header: "headerColor",
+        band: "bandColor",
+        paper: "paperColor",
+        size: "textSize"
+      };
+      for (const [k, id] of Object.entries(fields)) {
+        if (c[k] !== void 0) document.getElementById(id).value = c[k];
+      }
+      site.querySelector(".masthead").style.background = document.getElementById("headerColor").value;
+      site.querySelector(".selection").style.background = document.getElementById("bandColor").value;
+      site.style.background = document.getElementById("paperColor").value;
+      site.style.setProperty("--base-size", document.getElementById("textSize").value + "%");
+      document.getElementById("sizeOutput").textContent = document.getElementById("textSize").value + " %";
+    }
+    const colors = readColors() || embedded || {};
+    applyColors(colors);
+    ["headerColor", "bandColor", "paperColor", "textSize"].forEach(
+      (id) => document.getElementById(id).addEventListener("input", () => {
+        applyColors({});
+        try {
+          localStorage.setItem(
+            storageKey("colors"),
+            JSON.stringify({
+              header: document.getElementById("headerColor").value,
+              band: document.getElementById("bandColor").value,
+              paper: document.getElementById("paperColor").value,
+              size: document.getElementById("textSize").value
+            })
           );
-          if (answer === null) return;
-          caption.textContent = answer;
-          refresh();
-        });
-        site.addEventListener("input", (event) => {
-          if (event.target.matches(".panel-caption")) refresh();
-        });
-        // Refresh after restoring saved content or resetting the template.
-        const observer = new MutationObserver(() => refresh());
-        observer.observe(site, { childList: true });
-        refresh();
-      })();
-    </script>
-    <script id="text-editor">
-      (() => {
-        const site = document.getElementById("site");
-        // Include decorative text and links, including content restored from older exports.
-        const textSelectors =
-          ".editable,.stamp,.section-label,.panel-number,.placeholder,.precepts .n,.cover .fallback,.stock-mask,.book [data-link]";
-        function refresh() {
-          const enabled = site.classList.contains("editing") ? "true" : "false";
-          site.querySelectorAll(textSelectors).forEach((element) => {
-            if (!element.classList.contains("editable")) element.classList.add("editable");
-            if (element.getAttribute("contenteditable") !== enabled)
-              element.setAttribute("contenteditable", enabled);
-          });
+        } catch (e) {
         }
-        // Editing cover text must not open the image picker; editing link text must not navigate.
-        site.addEventListener(
-          "click",
-          (event) => {
-            if (!site.classList.contains("editing")) return;
-            const editable = event.target.closest(".editable");
-            if (editable?.closest(".cover") || editable?.matches("a")) {
-              if (editable.matches("a")) event.preventDefault();
-              event.stopPropagation();
-              editable.focus();
-            }
-          },
-          true,
-        );
-        const observer = new MutationObserver(refresh);
-        observer.observe(site, {
-          childList: true,
-          subtree: true,
-          attributes: true,
-          attributeFilter: ["class"],
-        });
-        refresh();
-      })();
-    </script>
-    <script id="palette-editor">
-      (() => {
-        const site = document.getElementById("site");
-        const target = document.getElementById("paletteTarget");
-        const text = document.getElementById("paletteText"),
-          background = document.getElementById("paletteBackground");
-        // Entries map visible controls to inherited variables carried by the site clone.
-        const groups = [
-          ["body", "Texte général", "text", "#202020", null],
-          ["header", "En-tête : texte secondaire", "header-text", "#202020", null],
-          ["title", "Titre principal", "title-text", "#202020", null],
-          ["heading", "Titres de section", "heading-text", "#202020", null],
-          ["label", "Bandeaux des rubriques", "label-text", "#ffffff", "label-bg", "#202020"],
-          ["stamp", "Badge de l’en-tête", "stamp-text", "#202020", "stamp-bg", "#ff9fa6"],
-          ["number", "Numéros des cases", "number-text", "#202020", "number-bg", "#ffda52"],
-          [
-            "bullet",
-            "Numéros des points de l’article",
-            "bullet-text",
-            "#202020",
-            "bullet-bg",
-            "#ff9fa6",
-          ],
-          ["panel", "Cases 1 et 4 : fond", null, null, "panel-bg", "#ffffff"],
-          ["panel2", "Cases 2 et 5 : fond", null, null, "panel2-bg", "#fff1ce"],
-          ["panel3", "Cases 3 et 6 : fond", null, null, "panel3-bg", "#dff1ee"],
-          ["caption", "Légendes des cases", "caption-text", "#202020", "caption-bg", "#ffffff"],
-          ["selection", "Présentation de la sélection", "selection-text", "#202020", null],
-          [
-            "cover",
-            "Couvertures : texte et fond impair",
-            "cover-text",
-            "#202020",
-            "cover-bg",
-            "#fff7d4",
-          ],
-          ["cover2", "Couvertures : fond pair", null, null, "cover2-bg", "#d8e9e7"],
-          ["spine", "Livre couché", "spine-text", "#202020", "spine-bg", "#fff7d4"],
-          [
-            "coming",
-            "Emplacement « Plus à venir »",
-            "coming-text",
-            "#202020",
-            "coming-bg",
-            "#fff9ee",
-          ],
-          ["stock", "Mentions de stock", "stock-text", "#ffffff", "stock-bg", "#141414"],
-          ["book-title", "Titres des livres", "book-title-text", "#202020", null],
-          ["link", "Liens des livres", "link-text", "#202020", null],
-          ["footer", "Pied de page", "footer-text", "#202020", "footer-bg", "#fffaf0"],
-          ["divider", "Séparateurs des points de l’article", null, null, "divider", "#bdb8aa"],
-        ];
-        const allowed = new Set([
-          "border",
-          "shadow",
-          ...groups.flatMap((g) => [g[2], g[4]]).filter(Boolean),
-        ]);
-        const storageKey = "blog-configurator:palette:" + location.pathname;
-        const valid = (value) => /^#[0-9a-f]{6}$/i.test(value);
-        function value(key, fallback) {
-          return site.style.getPropertyValue("--theme-" + key).trim() || fallback;
+      })
+    );
+    function ensureComingSoonLast() {
+      const books = document.getElementById("books");
+      const coming = books?.querySelector(".coming-soon");
+      if (coming && coming !== books.lastElementChild) books.append(coming);
+    }
+    ensureComingSoonLast();
+    site.addEventListener("click", (e) => {
+      if (!editing) return;
+      const change = e.target.closest(".edit-art,.upload-cover");
+      if (change) {
+        target = change.closest(".panel-art") || change.closest(".book")?.querySelector(".cover");
+        if (!target) {
+          toast("Emplacement image introuvable.");
+          return;
         }
-        function save() {
-          const colors = {};
-          allowed.forEach((key) => {
-            const color = value(key, "");
-            if (valid(color)) colors[key] = color;
-          });
-          try {
-            localStorage.setItem(storageKey, JSON.stringify(colors));
-          } catch (e) {}
+        imageInput.value = "";
+        imageInput.click();
+        return;
+      }
+      const stockToggle = e.target.closest(".toggle-stock");
+      if (stockToggle) {
+        const mask = stockToggle.closest(".book").querySelector(".stock-mask");
+        if (mask) {
+          mask.hidden = !mask.hidden;
+          toast(mask.hidden ? "Masque retiré" : "Masque rupture affiché");
         }
-        // Restore changes for this file; an export also carries its own inline palette.
-        try {
-          const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
-          Object.entries(saved).forEach(([key, color]) => {
-            if (allowed.has(key) && valid(color)) site.style.setProperty("--theme-" + key, color);
-          });
-        } catch (e) {}
-        target.replaceChildren();
-        groups.forEach((group) => target.add(new Option(group[1], group[0])));
-        function refresh() {
-          const group = groups.find((g) => g[0] === target.value);
-          text.disabled = !group[2];
-          background.disabled = !group[4];
-          text.value = group[2] ? value(group[2], group[3]) : "#202020";
-          background.value = group[4] ? value(group[4], group[5]) : "#ffffff";
-          document.getElementById("paletteBorder").value = value("border", "#202020");
-          document.getElementById("paletteShadow").value = value("shadow", "#242424");
-        }
-        target.addEventListener("change", refresh);
-        [
-          [text, 2],
-          [background, 4],
-        ].forEach(([input, index]) =>
-          input.addEventListener("input", () => {
-            const key = groups.find((g) => g[0] === target.value)[index];
-            if (key) {
-              site.style.setProperty("--theme-" + key, input.value);
-              save();
-            }
-          }),
-        );
-        [
-          ["paletteBorder", "border"],
-          ["paletteShadow", "shadow"],
-        ].forEach(([id, key]) =>
-          document.getElementById(id).addEventListener("input", (event) => {
-            site.style.setProperty("--theme-" + key, event.target.value);
-            save();
-          }),
-        );
-        document.getElementById("saveBtn").addEventListener("click", save);
-        const reset = document.getElementById("resetBtn"),
-          originalReset = reset.onclick;
-        reset.onclick = () => {
-          const previous = site.firstElementChild;
-          originalReset();
-          if (previous !== site.firstElementChild) {
-            allowed.forEach((key) => site.style.removeProperty("--theme-" + key));
-            try {
-              localStorage.removeItem(storageKey);
-            } catch (e) {}
-            refresh();
+        return;
+      }
+      const stockEdit = e.target.closest(".edit-stock");
+      if (stockEdit) {
+        const book = stockEdit.closest(".book"), mask = book.querySelector(".stock-mask"), field = book.querySelector(".stock-editor");
+        if (mask && field) {
+          field.value = mask.textContent;
+          field.classList.toggle("open");
+          if (field.classList.contains("open")) {
+            field.focus();
+            field.select();
           }
-        };
+        }
+        return;
+      }
+      const coverClick = e.target.closest(".cover");
+      if (coverClick && !coverClick.closest(".coming-soon")) {
+        target = coverClick;
+        imageInput.click();
+        return;
+      }
+      const link = e.target.closest(".edit-link");
+      if (link) {
+        const a = link.closest(".book").querySelector("[data-link]"), v = prompt(
+          "URL du livre (https://...)",
+          a.getAttribute("href") === "#" ? "" : a.getAttribute("href")
+        );
+        if (v !== null) {
+          if (v.trim() && !/^https?:\/\//i.test(v.trim()))
+            return alert("Utilise un lien commençant par https:// ou http://");
+          a.href = v.trim() || "#";
+          a.textContent = v.trim() ? "Voir le livre ↗" : "Lien vers le livre";
+        }
+        return;
+      }
+      const remove = e.target.closest(".remove-book");
+      if (remove) {
+        e.preventDefault();
+        e.stopPropagation();
+        const book = remove.closest(".book");
+        if (book && !book.classList.contains("coming-soon")) {
+          book.remove();
+          ensureComingSoonLast();
+          toast("Livre retiré.");
+        }
+        return;
+      }
+    });
+    site.addEventListener("input", (e) => {
+      if (e.target.matches(".stock-editor")) {
+        const mask = e.target.closest(".book").querySelector(".stock-mask");
+        if (mask) {
+          mask.textContent = e.target.value || "RUPTURE DE STOCK";
+          mask.hidden = false;
+        }
+      }
+    });
+    imageInput.onchange = () => {
+      const file = imageInput.files[0];
+      if (!file || !target) return;
+      if (!file.type.startsWith("image/")) {
+        alert("Choisis une image (JPG, PNG, WebP ou GIF).");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        target.querySelectorAll("img,.placeholder,.fallback").forEach((e) => e.remove());
+        const img = document.createElement("img");
+        img.src = reader.result;
+        img.alt = "Illustration personnalisée";
+        target.prepend(img);
+        toast("Image ajoutée !");
+        imageInput.value = "";
+      };
+      reader.onerror = () => toast("Impossible de lire cette image.");
+      reader.readAsDataURL(file);
+    };
+    document.getElementById("addBook").onclick = () => {
+      if (!editing) return;
+      const b = document.createElement("div");
+      b.className = "book";
+      b.innerHTML = '<div class="cover"><span class="fallback editable" contenteditable="true">NOUVELLE<br>LECTURE</span><span class="stock-mask" hidden>RUPTURE DE STOCK</span></div><h3 class="editable" contenteditable="true">Titre du livre</h3><a href="#" data-link>Lien vers le livre</a><div class="book-tools"><button class="mini upload-cover" type="button">📷 Image</button><button class="mini edit-link" type="button">🔗 Lien</button><button class="mini toggle-stock" type="button">🚫 Rupture : ON/OFF</button><button class="mini edit-stock" type="button">✍️ Modifier le texte de rupture</button><input class="stock-editor" type="text" aria-label="Texte de rupture de stock" placeholder="Ex. ÉPUISÉ"><button class="mini remove-book" type="button">✕ Retirer</button></div>';
+      const books = document.getElementById("books");
+      const coming = books.querySelector(".coming-soon");
+      if (coming) books.insertBefore(b, coming);
+      else books.append(b);
+      ensureComingSoonLast();
+      toast("Livre ajouté avant « Plus à venir ».");
+    };
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest("a[data-link]");
+      if (a && a.getAttribute("href") === "#") e.preventDefault();
+    });
+  })();
+
+  // src/js/comic-captions.js
+  (() => {
+    const site = document.getElementById("site");
+    if (!site) return;
+    function refresh() {
+      site.querySelectorAll(".comic-grid .panel").forEach((panel, index) => {
+        const caption = panel.querySelector(".panel-caption");
+        if (!caption) return;
+        panel.classList.toggle("caption-empty", !caption.textContent.trim());
+        if (!panel.querySelector(".comic-caption-edit")) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "comic-caption-edit";
+          button.textContent = "✏️ Modifier le texte";
+          button.setAttribute("aria-label", "Modifier le texte de la case " + (index + 1));
+          panel.appendChild(button);
+        }
+      });
+    }
+    site.addEventListener("click", (event) => {
+      const button = event.target.closest(".comic-caption-edit");
+      if (!button || !site.classList.contains("editing")) return;
+      event.preventDefault();
+      const caption = button.closest(".panel").querySelector(".panel-caption");
+      const answer = prompt(
+        "Texte de cette case (laisser vide pour agrandir l’image) :",
+        caption.textContent
+      );
+      if (answer === null) return;
+      caption.textContent = answer;
+      refresh();
+    });
+    site.addEventListener("input", (event) => {
+      if (event.target.matches(".panel-caption")) refresh();
+    });
+    const observer = new MutationObserver(() => refresh());
+    observer.observe(site, { childList: true });
+    refresh();
+  })();
+
+  // src/js/text-editor.js
+  (() => {
+    const site = document.getElementById("site");
+    const textSelectors = ".editable,.stamp,.section-label,.panel-number,.placeholder,.precepts .n,.cover .fallback,.stock-mask,.book [data-link]";
+    function refresh() {
+      const enabled = site.classList.contains("editing") ? "true" : "false";
+      site.querySelectorAll(textSelectors).forEach((element) => {
+        if (!element.classList.contains("editable")) element.classList.add("editable");
+        if (element.getAttribute("contenteditable") !== enabled)
+          element.setAttribute("contenteditable", enabled);
+      });
+    }
+    site.addEventListener(
+      "click",
+      (event) => {
+        if (!site.classList.contains("editing")) return;
+        const editable = event.target.closest(".editable");
+        if (editable?.closest(".cover") || editable?.matches("a")) {
+          if (editable.matches("a")) event.preventDefault();
+          event.stopPropagation();
+          editable.focus();
+        }
+      },
+      true
+    );
+    const observer = new MutationObserver(refresh);
+    observer.observe(site, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+    refresh();
+  })();
+
+  // src/js/palette-editor.js
+  (() => {
+    const site = document.getElementById("site");
+    const target = document.getElementById("paletteTarget");
+    const text = document.getElementById("paletteText"), background = document.getElementById("paletteBackground");
+    const groups = [
+      ["body", "Texte général", "text", "#202020", null],
+      ["header", "En-tête : texte secondaire", "header-text", "#202020", null],
+      ["title", "Titre principal", "title-text", "#202020", null],
+      ["heading", "Titres de section", "heading-text", "#202020", null],
+      ["label", "Bandeaux des rubriques", "label-text", "#ffffff", "label-bg", "#202020"],
+      ["stamp", "Badge de l’en-tête", "stamp-text", "#202020", "stamp-bg", "#ff9fa6"],
+      ["number", "Numéros des cases", "number-text", "#202020", "number-bg", "#ffda52"],
+      [
+        "bullet",
+        "Numéros des points de l’article",
+        "bullet-text",
+        "#202020",
+        "bullet-bg",
+        "#ff9fa6"
+      ],
+      ["panel", "Cases 1 et 4 : fond", null, null, "panel-bg", "#ffffff"],
+      ["panel2", "Cases 2 et 5 : fond", null, null, "panel2-bg", "#fff1ce"],
+      ["panel3", "Cases 3 et 6 : fond", null, null, "panel3-bg", "#dff1ee"],
+      ["caption", "Légendes des cases", "caption-text", "#202020", "caption-bg", "#ffffff"],
+      ["selection", "Présentation de la sélection", "selection-text", "#202020", null],
+      [
+        "cover",
+        "Couvertures : texte et fond impair",
+        "cover-text",
+        "#202020",
+        "cover-bg",
+        "#fff7d4"
+      ],
+      ["cover2", "Couvertures : fond pair", null, null, "cover2-bg", "#d8e9e7"],
+      ["spine", "Livre couché", "spine-text", "#202020", "spine-bg", "#fff7d4"],
+      [
+        "coming",
+        "Emplacement « Plus à venir »",
+        "coming-text",
+        "#202020",
+        "coming-bg",
+        "#fff9ee"
+      ],
+      ["stock", "Mentions de stock", "stock-text", "#ffffff", "stock-bg", "#141414"],
+      ["book-title", "Titres des livres", "book-title-text", "#202020", null],
+      ["link", "Liens des livres", "link-text", "#202020", null],
+      ["footer", "Pied de page", "footer-text", "#202020", "footer-bg", "#fffaf0"],
+      ["divider", "Séparateurs des points de l’article", null, null, "divider", "#bdb8aa"]
+    ];
+    const allowed = /* @__PURE__ */ new Set([
+      "border",
+      "shadow",
+      ...groups.flatMap((g) => [g[2], g[4]]).filter(Boolean)
+    ]);
+    const storageKey = "blog-configurator:palette:" + location.pathname;
+    const valid = (value2) => /^#[0-9a-f]{6}$/i.test(value2);
+    function value(key, fallback) {
+      return site.style.getPropertyValue("--theme-" + key).trim() || fallback;
+    }
+    function save() {
+      const colors = {};
+      allowed.forEach((key) => {
+        const color = value(key, "");
+        if (valid(color)) colors[key] = color;
+      });
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(colors));
+      } catch (e) {
+      }
+    }
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+      Object.entries(saved).forEach(([key, color]) => {
+        if (allowed.has(key) && valid(color)) site.style.setProperty("--theme-" + key, color);
+      });
+    } catch (e) {
+    }
+    target.replaceChildren();
+    groups.forEach((group) => target.add(new Option(group[1], group[0])));
+    function refresh() {
+      const group = groups.find((g) => g[0] === target.value);
+      text.disabled = !group[2];
+      background.disabled = !group[4];
+      text.value = group[2] ? value(group[2], group[3]) : "#202020";
+      background.value = group[4] ? value(group[4], group[5]) : "#ffffff";
+      document.getElementById("paletteBorder").value = value("border", "#202020");
+      document.getElementById("paletteShadow").value = value("shadow", "#242424");
+    }
+    target.addEventListener("change", refresh);
+    [
+      [text, 2],
+      [background, 4]
+    ].forEach(
+      ([input, index]) => input.addEventListener("input", () => {
+        const key = groups.find((g) => g[0] === target.value)[index];
+        if (key) {
+          site.style.setProperty("--theme-" + key, input.value);
+          save();
+        }
+      })
+    );
+    [
+      ["paletteBorder", "border"],
+      ["paletteShadow", "shadow"]
+    ].forEach(
+      ([id, key]) => document.getElementById(id).addEventListener("input", (event) => {
+        site.style.setProperty("--theme-" + key, event.target.value);
+        save();
+      })
+    );
+    document.getElementById("saveBtn").addEventListener("click", save);
+    const reset = document.getElementById("resetBtn"), originalReset = reset.onclick;
+    reset.onclick = () => {
+      const previous = site.firstElementChild;
+      originalReset();
+      if (previous !== site.firstElementChild) {
+        allowed.forEach((key) => site.style.removeProperty("--theme-" + key));
+        try {
+          localStorage.removeItem(storageKey);
+        } catch (e) {
+        }
         refresh();
-      })();
+      }
+    };
+    refresh();
+  })();
+})();
+
     </script>
+
+
+
+
+
+
   </body>
 </html>

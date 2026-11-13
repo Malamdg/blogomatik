@@ -6,7 +6,7 @@ Le modèle fourni contient des textes et des images de remplacement. Vous pouvez
 
 ## Utilisation
 
-1. Téléchargez `index.html` et ouvrez-le dans un navigateur récent.
+1. Téléchargez le fichier `index.html` depuis la dernière release : [Releases](https://github.com/Malamdg/blogomatik/releases), ou utilisez `out/index.html` après avoir généré le projet, puis ouvrez-le dans un navigateur récent.
 2. En mode édition, cliquez sur les textes du blog pour les modifier.
 3. Utilisez les commandes des cases et des livres pour importer vos images et modifier les mentions de stock.
 4. Réglez la police, la taille du texte et les couleurs dans la partie **Apparence**.
@@ -31,6 +31,21 @@ Le rendu dépend du navigateur et du contenu ajouté : vérifiez l’aperçu ava
 ## Données
 
 Les modifications enregistrées restent dans le stockage local du navigateur et ne sont pas synchronisées entre appareils. Si le stockage local est désactivé ou saturé, exportez le fichier HTML pour conserver votre travail.
+
+Les données locales dépendent aussi du chemin du fichier : si vous déplacez le fichier ou passez de l’ancien `index.html` à `out/index.html`, vos données enregistrées ne seront pas nécessairement retrouvées. Avant de changer de chemin, exportez votre blog en HTML et utilisez ce fichier pour conserver votre travail.
+
+## Développement
+
+Le développement nécessite Node.js 20 ou une version plus récente et npm. Depuis la racine du dépôt :
+
+```sh
+npm ci
+npm run build
+npm run watch
+npm run lint
+```
+
+Le build assemble `src/html/index.html`, `src/css/styles.css` et les modules de `src/js/` dans `out/index.html`. Le script de génération se trouve dans `src/bundler/`. Modifiez les sources plutôt que le fichier généré, puis relancez le build. `npm run watch` reconstruit automatiquement le fichier lorsque les fichiers de ces trois dossiers changent (arrêt avec Ctrl+C). `npm run lint` vérifie le JavaScript des sources avec ESLint. Le fichier final reste autonome et ne nécessite ni Node.js ni serveur pour être utilisé.
 
 ## À propos
 
