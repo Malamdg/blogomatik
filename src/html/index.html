@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Configurateur de blog</title>
+
+    <meta
+      name="description"
+      content="Personnalisez votre blog : textes, images, couleurs et export HTML ou PDF, directement dans votre navigateur."
+    />
+    <style id="blog-styles">
+<!-- BLOG_STYLES -->
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="editor-controls" aria-label="Configuration du blog">
+        <div class="editor-heading">
+          <strong>Votre blog, à votre façon</strong>
+          <p>Activez l’édition, puis cliquez sur un texte du blog pour le modifier.</p>
+        </div>
+        <div class="toolbar">
+          <section class="control-group" aria-labelledby="editHeading">
+            <h2 id="editHeading">1. Édition</h2>
+            <div class="actions">
+              <button class="btn primary" id="editBtn" type="button">✏️ Activer l’édition</button
+              ><button class="btn" id="saveBtn" type="button">💾 Enregistrer</button
+              ><button class="btn reset-button" id="resetBtn" type="button">↺ Réinitialiser</button>
+            </div>
+            <p>« Enregistrer » conserve vos changements dans ce navigateur.</p>
+          </section>
+          <section class="control-group appearance-group" aria-labelledby="appearanceHeading">
+            <h2 id="appearanceHeading">2. Apparence</h2>
+            <div class="config-bar">
+              <label class="font-control" for="fontSelect"
+                >Police globale
+                <select id="fontSelect" aria-label="Police d’écriture globale">
+                  <option value="dm">DM Sans (moderne)</option>
+                  <option value="comic">Comic Sans (BD)</option>
+                  <option value="marker">Permanent Marker</option>
+                  <option value="arial">Arial (classique)</option>
+                  <option value="georgia">Georgia (littéraire)</option>
+                  <option value="verdana">Verdana (lisible)</option>
+                  <option value="courier">Courier New (machine)</option>
+                </select></label
+              >
+              <label class="size-control"
+                >Taille du texte
+                <span
+                  ><input
+                    id="textSize"
+                    type="range"
+                    min="85"
+                    max="135"
+                    value="100"
+                    step="5"
+                  /><output id="sizeOutput" for="textSize">100 %</output></span
+                ></label
+              >
+              <div class="color-controls">
+                <label>Titre <input id="headerColor" type="color" value="#ffda52" /></label
+                ><label>Bandeau <input id="bandColor" type="color" value="#f9cbd0" /></label
+                ><label>Page <input id="paperColor" type="color" value="#fffaf0" /></label>
+              </div>
+            </div>
+          </section>
+          <details class="palette-controls">
+            <summary>Couleurs détaillées du blog</summary>
+            <p>
+              Choisissez un élément, puis sa couleur de texte ou de fond. Les contours et les ombres
+              se règlent pour tout le blog.
+            </p>
+            <div class="palette-fields">
+              <label
+                >Élément
+                <select id="paletteTarget"></select
+              ></label>
+              <label>Texte <input id="paletteText" type="color" /></label>
+              <label>Fond <input id="paletteBackground" type="color" disabled="" /></label>
+              <label>Contours <input id="paletteBorder" type="color" value="#202020" /></label>
+              <label>Ombres <input id="paletteShadow" type="color" value="#242424" /></label>
+            </div>
+          </details>
+          <section class="control-group export-group" aria-labelledby="exportHeading">
+            <h2 id="exportHeading">3. Export</h2>
+            <div class="actions">
+              <button class="btn" id="exportBtn" type="button">⬇️ Exporter le site HTML</button>
+              <div class="pdf-actions">
+                <label class="pdf-format-control" for="pdfFormat"
+                  >Format
+                  <select id="pdfFormat" aria-label="Format de papier PDF">
+                    <option>A1</option>
+                    <option>A2</option>
+                    <option>A3</option>
+                    <option selected="">A4</option>
+                    <option>A5</option>
+                  </select></label
+                ><button class="btn" id="pdfBtn" type="button">📄 Exporter en PDF</button>
+              </div>
+            </div>
+            <p>HTML modifiable ou PDF prêt à imprimer.</p>
+          </section>
+        </div>
+      </div>
+      <main class="site" id="site">
+        <header class="masthead" style="background: rgb(255, 218, 82)">
+          <div class="eyebrow editable">VOTRE BLOG · ÉDITION N° 01</div>
+          <h1 class="editable">Le titre de votre blog</h1>
+          <p class="editable">
+            Présentez ici votre univers, votre projet ou le thème de cette édition.
+          </p>
+          <div class="stamp editable">Votre<br />badge</div>
+        </header>
+        <div class="content">
+          <section class="comic-section">
+            <span class="section-label editable">VOTRE HISTOIRE EN IMAGES</span>
+            <h2 class="editable">Le titre de votre bande dessinée</h2>
+            <div class="comic-grid" id="comicGrid">
+              <div class="panel">
+                <span class="panel-number editable">1</span>
+                <div class="panel-art">
+                  <span class="placeholder editable">▧</span
+                  ><button class="edit-art" type="button">Changer l'image</button>
+                </div>
+                <div class="panel-caption editable">Légende de la case 1.</div>
+              </div>
+              <div class="panel">
+                <span class="panel-number editable">2</span>
+                <div class="panel-art">
+                  <span class="placeholder editable">▧</span
+                  ><button class="edit-art" type="button">Changer l'image</button>
+                </div>
+                <div class="panel-caption editable">Légende de la case 2.</div>
+              </div>
+              <div class="panel">
+                <span class="panel-number editable">3</span>
+                <div class="panel-art">
+                  <span class="placeholder editable">▧</span
+                  ><button class="edit-art" type="button">Changer l'image</button>
+                </div>
+                <div class="panel-caption editable">Légende de la case 3.</div>
+              </div>
+              <div class="panel">
+                <span class="panel-number editable">4</span>
+                <div class="panel-art">
+                  <span class="placeholder editable">▧</span
+                  ><button class="edit-art" type="button">Changer l'image</button>
+                </div>
+                <div class="panel-caption editable">Légende de la case 4.</div>
+              </div>
+              <div class="panel">
+                <span class="panel-number editable">5</span>
+                <div class="panel-art">
+                  <span class="placeholder editable">▧</span
+                  ><button class="edit-art" type="button">Changer l'image</button>
+                </div>
+                <div class="panel-caption editable">Légende de la case 5.</div>
+              </div>
+              <div class="panel">
+                <span class="panel-number editable">6</span>
+                <div class="panel-art">
+                  <span class="placeholder editable">▧</span
+                  ><button class="edit-art" type="button">Changer l'image</button>
+                </div>
+                <div class="panel-caption editable">Légende de la case 6.</div>
+              </div>
+            </div>
+            <p class="note">
+              En mode édition, clique sur « Changer l'image » pour remplacer chaque illustration par
+              ton dessin ou une photo.
+            </p>
+          </section>
+          <article class="post-section">
+            <span class="section-label editable">VOTRE ARTICLE</span>
+            <h2 class="editable">Le titre de votre article</h2>
+            <p class="post-intro editable">
+              Ajoutez une courte introduction pour présenter les dix points de votre article.
+            </p>
+            <ol class="precepts">
+              <li>
+                <span class="n editable">01</span>
+                <div>
+                  <strong class="editable">Titre du point 1</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+              <li>
+                <span class="n editable">02</span>
+                <div>
+                  <strong class="editable">Titre du point 2</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+              <li>
+                <span class="n editable">03</span>
+                <div>
+                  <strong class="editable">Titre du point 3</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+              <li>
+                <span class="n editable">04</span>
+                <div>
+                  <strong class="editable">Titre du point 4</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+              <li>
+                <span class="n editable">05</span>
+                <div>
+                  <strong class="editable">Titre du point 5</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+              <li>
+                <span class="n editable">06</span>
+                <div>
+                  <strong class="editable">Titre du point 6</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+              <li>
+                <span class="n editable">07</span>
+                <div>
+                  <strong class="editable">Titre du point 7</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+              <li>
+                <span class="n editable">08</span>
+                <div>
+                  <strong class="editable">Titre du point 8</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+              <li>
+                <span class="n editable">09</span>
+                <div>
+                  <strong class="editable">Titre du point 9</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+              <li>
+                <span class="n editable">10</span>
+                <div>
+                  <strong class="editable">Titre du point 10</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+            </ol>
+          </article>
+        </div>
+        <section class="selection" style="background: rgb(249, 203, 208)">
+          <div class="selection-header">
+            <div>
+              <span class="section-label editable">VOTRE SÉLECTION</span>
+              <h2 class="editable">Vos recommandations de lecture</h2>
+              <p class="editable">Présentez ici les ouvrages que vous souhaitez partager.</p>
+            </div>
+            <button type="button" class="btn add-book" id="addBook">＋ Ajouter un livre</button>
+          </div>
+          <div class="books" id="books">
+            <div class="book">
+              <div class="cover">
+                <span class="fallback editable">Couverture 1</span
+                ><span class="stock-mask editable" hidden="">MENTION DE STOCK</span>
+              </div>
+              <h3 class="editable">Titre du livre 1</h3>
+              <a href="#" data-link="" class="editable">Découvrir le livre</a>
+              <div class="book-tools">
+                <button class="mini upload-cover" type="button">📷 Image</button
+                ><button class="mini edit-link" type="button">🔗 Lien</button
+                ><button class="mini toggle-stock" type="button">🚫 Rupture : ON/OFF</button
+                ><button class="mini edit-stock" type="button">
+                  ✍️ Modifier le texte de rupture</button
+                ><input
+                  class="stock-editor"
+                  type="text"
+                  aria-label="Texte de rupture de stock"
+                  placeholder="Ex. ÉPUISÉ"
+                /><button class="mini remove-book" type="button">✕ Retirer</button>
+              </div>
+            </div>
+            <div class="book">
+              <div class="cover">
+                <span class="fallback editable">Couverture 2</span
+                ><span class="stock-mask editable" hidden="">MENTION DE STOCK</span>
+              </div>
+              <h3 class="editable">Titre du livre 2</h3>
+              <a href="#" data-link="" class="editable">Découvrir le livre</a>
+              <div class="book-tools">
+                <button class="mini upload-cover" type="button">📷 Image</button
+                ><button class="mini edit-link" type="button">🔗 Lien</button
+                ><button class="mini toggle-stock" type="button">🚫 Rupture : ON/OFF</button
+                ><button class="mini edit-stock" type="button">
+                  ✍️ Modifier le texte de rupture</button
+                ><input
+                  class="stock-editor"
+                  type="text"
+                  aria-label="Texte de rupture de stock"
+                  placeholder="Ex. ÉPUISÉ"
+                /><button class="mini remove-book" type="button">✕ Retirer</button>
+              </div>
+            </div>
+            <div class="book spine-book">
+              <div class="cover">
+                <span class="fallback editable">Livre 3</span
+                ><span class="stock-mask editable" hidden="">MENTION DE STOCK</span>
+              </div>
+              <h3 class="editable">Titre du livre 3</h3>
+              <a href="#" data-link="" class="editable">Découvrir le livre</a>
+              <div class="book-tools">
+                <button class="mini upload-cover" type="button">📷 Image</button
+                ><button class="mini edit-link" type="button">🔗 Lien</button
+                ><button class="mini toggle-stock" type="button">🚫 Rupture : ON/OFF</button
+                ><button class="mini edit-stock" type="button">
+                  ✍️ Modifier le texte de rupture</button
+                ><input
+                  class="stock-editor"
+                  type="text"
+                  aria-label="Texte de rupture de stock"
+                  placeholder="Ex. ÉPUISÉ"
+                /><button class="mini remove-book" type="button">✕ Retirer</button>
+              </div>
+            </div>
+            <div class="book coming-soon">
+              <div class="cover"><span class="fallback editable">…</span></div>
+              <h3 class="editable">Plus à venir…</h3>
+            </div>
+          </div>
+        </section>
+        <footer class="footer">
+          <span class="editable">© Votre blog — Votre mention de droits.</span
+          ><span class="editable">Votre signature ou votre slogan.</span>
+        </footer>
+      </main>
+      <p class="note">
+        Pour les livres : clique sur « 📷 Image » pour importer une couverture, « 🚫 Rupture » pour
+        afficher/masquer le bandeau et « ✍️ Texte rupture » pour personnaliser son message. Le
+        troisième livre est couché à plat : sa longueur est égale à la hauteur des autres
+        couvertures. La quatrième place annonce « Plus à venir… ».
+      </p>
+      <p class="note">
+        Cliquez sur un texte pour le modifier. « Enregistrer » conserve les changements dans ce
+        navigateur ; « Exporter le site HTML » crée un fichier modifiable avec vos images intégrées.
+        Les polices Google nécessitent une connexion ; une police locale prend le relais hors
+        connexion.
+      </p>
+      <p class="note">
+        Blogomatik par MalaM :
+        <a href="https://github.com/Malamdg/blogomatik" target="_blank" rel="noopener noreferrer"
+          >https://github.com/Malamdg/blogomatik</a
+        >
+      </p>
+      <input class="hidden-input" type="file" id="imageInput" accept="image/*" />
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <script id="blog-configurator">
+<!-- BLOG_SCRIPT -->
+    </script>
+
+
+
+
+
+
+  </body>
+</html>
