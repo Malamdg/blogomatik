@@ -1,0 +1,2345 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Configurateur de blog</title>
+
+    <meta
+      name="description"
+      content="Personnalisez votre blog : textes, images, couleurs et export HTML ou PDF, directement dans votre navigateur."
+    />
+    <style id="blog-styles">
+      @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Permanent+Marker&display=swap");
+      :root {
+        --ink: #202020;
+        --paper: #fffaf0;
+        --yellow: #ffda52;
+        --pink: #ff9fa6;
+        --blue: #b5e2e4;
+        --line: 3px solid var(--ink);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #efece5;
+        color: var(--ink);
+        font-family: var(--global-font, "DM Sans", Arial, sans-serif);
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      .wrap {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 28px 22px 60px;
+      }
+      .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 22px;
+      }
+      .toolbar p {
+        margin: 0;
+        font-size: 13px;
+        color: #555;
+      }
+      .actions {
+        display: flex;
+        gap: 9px;
+        flex-wrap: wrap;
+      }
+      .btn {
+        color: #202020 !important;
+        -webkit-text-fill-color: #202020;
+        opacity: 1;
+        border: 2px solid var(--ink);
+        background: #fff;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-weight: 800;
+        box-shadow: 3px 3px 0 var(--ink);
+      }
+      .btn.primary {
+        background: var(--yellow);
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+      .site {
+        background: var(--paper);
+        border: var(--line);
+        box-shadow: 10px 10px 0 #242424;
+        overflow: hidden;
+      }
+      .masthead {
+        padding: 35px 42px 28px;
+        background: var(--yellow);
+        border-bottom: var(--line);
+        position: relative;
+      }
+      .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.22em;
+        font-size: 12px;
+        font-weight: 800;
+      }
+      .masthead h1 {
+        font-family: var(--global-font, "Permanent Marker", "Comic Sans MS", cursive);
+        font-size: clamp(36px, 5.2vw, 72px);
+        line-height: 1.05;
+        margin: 12px 0 15px;
+        max-width: 920px;
+      }
+      .masthead p {
+        max-width: 700px;
+        margin: 0;
+        font-size: 17px;
+        font-weight: 600;
+      }
+      .stamp {
+        position: absolute;
+        right: 40px;
+        top: 34px;
+        transform: rotate(12deg);
+        border: 3px solid;
+        border-radius: 50%;
+        width: 88px;
+        height: 88px;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 800;
+        background: var(--pink);
+      }
+      .content {
+        display: grid;
+        grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+        gap: 0;
+      }
+      .comic-section {
+        padding: 32px;
+        border-right: var(--line);
+      }
+      .post-section {
+        padding: 32px;
+      }
+      .section-label {
+        display: inline-block;
+        background: var(--ink);
+        color: white;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        padding: 8px 12px;
+        transform: rotate(-2deg);
+      }
+      h2 {
+        font-family: var(--global-font, "Permanent Marker", "Comic Sans MS", cursive);
+        font-size: clamp(25px, 3vw, 36px);
+        line-height: 1.2;
+        margin: 18px 0 24px;
+      }
+      .comic-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 13px;
+      }
+      .panel {
+        position: relative;
+        border: 3px solid var(--ink);
+        background: #fff;
+        min-height: 230px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 4px 4px 0 var(--ink);
+      }
+      .panel:nth-child(3n + 2) {
+        background: #fff1ce;
+      }
+      .panel:nth-child(3n) {
+        background: #dff1ee;
+      }
+      .panel-number {
+        position: absolute;
+        top: 9px;
+        left: 10px;
+        background: var(--yellow);
+        border: 2px solid var(--ink);
+        border-radius: 50%;
+        width: 29px;
+        height: 29px;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        font-size: 12px;
+        z-index: 2;
+      }
+      .panel-art {
+        height: 153px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .panel-art img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .placeholder {
+        font-size: 64px;
+        filter: grayscale(0.15);
+        user-select: none;
+      }
+      .panel-caption {
+        padding: 12px 12px 14px;
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1.35;
+        border-top: 2px solid var(--ink);
+        flex: 1;
+      }
+      .edit-art {
+        display: none;
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        background: white;
+        border: 2px solid var(--ink);
+        border-radius: 7px;
+        padding: 5px 8px;
+        font-size: 11px;
+        font-weight: 800;
+        z-index: 3;
+      }
+      .editing .edit-art {
+        display: block;
+      }
+      .post-intro {
+        font-size: 16px;
+        line-height: 1.65;
+        margin: 0 0 22px;
+      }
+      .precepts {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .precepts li {
+        display: grid;
+        grid-template-columns: 42px 1fr;
+        gap: 12px;
+        padding: 14px 0;
+        border-bottom: 2px dashed #bdb8aa;
+        align-items: start;
+      }
+      .precepts .n {
+        width: 36px;
+        height: 36px;
+        border: 2px solid var(--ink);
+        background: var(--pink);
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        transform: rotate(-8deg);
+      }
+      .precepts strong {
+        font-size: 15px;
+        display: block;
+        margin-bottom: 4px;
+      }
+      .precepts p {
+        font-size: 14px;
+        line-height: 1.5;
+        margin: 0;
+      }
+      .selection {
+        padding: 32px 36px 40px;
+        border-top: var(--line);
+        background: #f9cbd0;
+      }
+      .selection-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .selection h2 {
+        margin: 14px 0 4px;
+      }
+      .selection p {
+        margin: 0 0 22px;
+      }
+      .books {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 18px;
+      }
+      .book {
+        min-width: 0;
+      }
+      .cover {
+        aspect-ratio: 3/4;
+        border: 3px solid var(--ink);
+        box-shadow: 5px 5px 0 var(--ink);
+        background: #fff7d4;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        text-align: center;
+      }
+      .book:nth-child(even) .cover {
+        background: #d8e9e7;
+      }
+      .cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .cover .fallback {
+        font-family: var(--global-font, "Permanent Marker", "Comic Sans MS", cursive);
+        font-size: clamp(16px, 2vw, 25px);
+        padding: 14px;
+        overflow-wrap: anywhere;
+      }
+      .book h3 {
+        font-size: 15px;
+        margin: 14px 0 6px;
+      }
+      .book a {
+        color: inherit;
+        font-size: 13px;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        overflow-wrap: anywhere;
+      }
+      .book-tools {
+        display: none;
+        gap: 6px;
+        margin-top: 10px;
+        flex-wrap: wrap;
+      }
+      .editing .book-tools {
+        display: flex;
+      }
+      .mini {
+        font-size: 11px;
+        font-weight: 800;
+        border: 2px solid;
+        background: #fff;
+        border-radius: 6px;
+        padding: 6px 8px;
+      }
+      .add-book {
+        display: none;
+      }
+      .editing .add-book {
+        display: inline-block;
+      }
+      .footer {
+        padding: 16px 36px;
+        border-top: var(--line);
+        background: var(--paper);
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        flex-wrap: wrap;
+      }
+      .editable {
+        outline: none;
+      }
+      .editing .editable {
+        outline: 2px dashed #e05b65;
+        outline-offset: 3px;
+        border-radius: 2px;
+      }
+      .editing .editable:focus {
+        background: #fff8cf;
+      }
+      .note {
+        margin: 15px 0 0;
+        font-size: 12px;
+        color: #555;
+        line-height: 1.5;
+      }
+      .hidden-input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .toast {
+        position: fixed;
+        bottom: 18px;
+        right: 18px;
+        background: #202020;
+        color: #fff;
+        padding: 12px 17px;
+        border-radius: 8px;
+        font-size: 13px;
+        display: none;
+        z-index: 10;
+      }
+      @media (max-width: 850px) {
+        .content {
+          grid-template-columns: 1fr;
+        }
+        .comic-section {
+          border-right: 0;
+          border-bottom: var(--line);
+        }
+        .books {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .stamp {
+          position: static;
+          margin-top: 20px;
+          width: 65px;
+          height: 65px;
+          font-size: 11px;
+        }
+        .masthead {
+          padding: 28px;
+        }
+        .comic-section,
+        .post-section {
+          padding: 25px;
+        }
+      }
+      @media (max-width: 470px) {
+        .comic-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .wrap {
+          padding: 14px 10px 35px;
+        }
+        .comic-grid {
+          gap: 9px;
+        }
+        .panel {
+          min-height: 185px;
+        }
+        .panel-art {
+          height: 115px;
+        }
+        .placeholder {
+          font-size: 47px;
+        }
+        .panel-caption {
+          font-size: 12px;
+          padding: 9px;
+        }
+        .selection {
+          padding: 25px 20px;
+        }
+        .books {
+          gap: 15px;
+        }
+        .masthead h1 {
+          font-size: 37px;
+        }
+        .footer {
+          padding: 16px 20px;
+        }
+      }
+      .font-control {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .font-control select {
+        color: #202020;
+        background: #fff;
+        border: 2px solid #202020;
+        border-radius: 8px;
+        padding: 9px 10px;
+        max-width: 220px;
+        font: inherit;
+      }
+      .actions .btn {
+        white-space: nowrap;
+      }
+      .toolbar {
+        align-items: flex-start;
+      }
+      @media (max-width: 470px) {
+        .comic-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .actions {
+          width: 100%;
+        }
+        .actions .btn {
+          flex: 1 1 auto;
+        }
+        .font-control {
+          width: 100%;
+        }
+      }
+      .config-bar {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 14px 16px;
+        margin: 0 0 20px;
+        background: #fff;
+        border: 2px solid #202020;
+        border-radius: 12px;
+      }
+      .config-bar label {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font-weight: 700;
+        font-size: 13px;
+      }
+      .config-bar input[type="color"] {
+        width: 42px;
+        height: 36px;
+        border: 1px solid #888;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .config-bar input[type="range"] {
+        width: 100px;
+      }
+      .site {
+        font-size: var(--base-size, 100%);
+      }
+      .site .post-intro {
+        font-size: 1em;
+      }
+      .site .precepts p {
+        font-size: 0.9em;
+      }
+      .site .panel-caption {
+        font-size: 0.9em;
+      }
+      .site .book h3 {
+        font-size: 0.95em;
+      }
+      .site .masthead p {
+        font-size: 1.08em;
+      }
+      .actions .btn {
+        color: #202020 !important;
+        background: #fff !important;
+        -webkit-text-fill-color: #202020 !important;
+      }
+      .actions .btn.primary {
+        background: #ffda52 !important;
+      }
+      .config-bar output {
+        min-width: 40px;
+      }
+
+      /* Book covers and stock overlays */
+      .books > .book.spine-book .cover {
+        width: 24%;
+        min-width: 25px;
+        max-width: 55px;
+        aspect-ratio: 1/5;
+        min-height: 180px;
+        margin-left: 10px;
+        overflow: hidden;
+      }
+      .books > .book.spine-book .cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: left center;
+      }
+      .books > .book.spine-book .cover .fallback {
+        font-size: 11px;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        padding: 6px;
+      }
+      .books > .book.coming-soon .cover {
+        border-style: dashed;
+        background: #fff9ee;
+        box-shadow: none;
+      }
+      .books > .book.coming-soon .cover .fallback {
+        font-size: clamp(42px, 6vw, 75px);
+        letter-spacing: 0.12em;
+      }
+      .books > .book.coming-soon h3 {
+        text-align: center;
+      }
+      .stock-mask {
+        position: absolute;
+        inset: 0;
+        background: rgba(20, 20, 20, 0.72);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 8px;
+        font-weight: 900;
+        font-size: clamp(11px, 1.5vw, 18px);
+        line-height: 1.25;
+        overflow-wrap: anywhere;
+        z-index: 2;
+        transform: rotate(0deg);
+      }
+      .stock-mask[hidden] {
+        display: none !important;
+      }
+      .books > .book.spine-book .stock-mask {
+        font-size: 11px;
+        writing-mode: vertical-rl;
+        padding: 3px;
+      }
+      .editing .cover {
+        cursor: pointer;
+      }
+      .book-tools .mini {
+        color: #202020 !important;
+        -webkit-text-fill-color: #202020 !important;
+        min-height: 34px;
+      }
+      @media (max-width: 470px) {
+        .comic-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .books > .book.spine-book .cover {
+          min-height: 135px;
+        }
+      }
+
+      /* Comic panels and editing controls */
+      .content {
+        display: block;
+      }
+      .comic-section {
+        border-right: 0;
+        border-bottom: var(--line);
+      }
+      .comic-grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .panel {
+        min-height: 205px;
+        box-shadow: 3px 3px 0 var(--ink);
+      }
+      .panel-art {
+        height: 118px;
+      }
+      .placeholder {
+        font-size: 48px;
+      }
+      .panel-caption {
+        font-size: 12px !important;
+        padding: 9px;
+      }
+      .edit-art {
+        position: relative;
+        bottom: auto;
+        right: auto;
+        margin: 4px 5px 6px;
+        align-self: stretch;
+        min-height: 35px;
+        white-space: normal;
+      }
+      .editing .edit-art {
+        display: block;
+      }
+      .edit-art,
+      .book-tools button,
+      .mini {
+        color: #111 !important;
+        -webkit-text-fill-color: #111 !important;
+        background: #fff !important;
+        font-family: Arial, sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 800 !important;
+        line-height: 1.25 !important;
+        opacity: 1 !important;
+        text-shadow: none !important;
+      }
+      .book-tools {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .book-tools .mini {
+        width: 100%;
+        text-align: left;
+        min-height: 37px;
+      }
+      .stock-editor {
+        display: none;
+        width: 100%;
+        border: 2px solid #222;
+        border-radius: 5px;
+        background: white;
+        color: #111;
+        padding: 7px;
+        font-size: 14px;
+        min-width: 0;
+      }
+      .editing .stock-editor.open {
+        display: block;
+      }
+      .books > .book.spine-book .cover {
+        width: 85%;
+        max-width: none;
+        min-width: 0;
+        height: 55px;
+        min-height: 0;
+        aspect-ratio: auto;
+        margin: 65px auto 0;
+        transform: rotate(-8deg);
+        transform-origin: center;
+        box-shadow: 5px 5px 0 var(--ink);
+      }
+      .books > .book.spine-book .cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .books > .book.spine-book .cover .fallback {
+        writing-mode: horizontal-tb;
+        transform: none;
+        font-size: 14px;
+        padding: 4px;
+      }
+      .books > .book.spine-book .stock-mask {
+        writing-mode: horizontal-tb;
+        font-size: 11px;
+      }
+      @media (max-width: 1050px) {
+        .comic-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 560px) {
+        .comic-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .books {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      /* Desktop two-column layout and responsive comic grid */
+      @media (min-width: 851px) {
+        .content {
+          display: grid;
+          grid-template-columns: minmax(0, 1.18fr) minmax(0, 0.82fr);
+          align-items: stretch;
+        }
+        .comic-section {
+          border-right: var(--line);
+          border-bottom: 0;
+          min-width: 0;
+        }
+        .post-section {
+          min-width: 0;
+          align-self: stretch;
+        }
+        .comic-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 12px;
+        }
+        .panel {
+          min-width: 0;
+        }
+      }
+      @media (max-width: 850px) {
+        .content {
+          display: block;
+        }
+        .comic-section {
+          border-right: 0;
+          border-bottom: var(--line);
+        }
+        .comic-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 560px) {
+        .comic-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      /* Horizontal third book */
+      .books > .book.spine-book .cover {
+        width: 100%;
+        height: auto;
+        min-height: 0;
+        max-width: none;
+        aspect-ratio: 3/4;
+        margin: 0;
+        transform: none;
+        box-shadow: none;
+        border: 0;
+        background: transparent !important;
+        overflow: visible;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .books > .book.spine-book .cover::before {
+        content: none;
+      }
+      .books > .book.spine-book .cover img,
+      .books > .book.spine-book .cover .fallback {
+        width: 100%;
+        height: 21%;
+        min-height: 24px;
+        max-height: 65px;
+        border: 3px solid var(--ink);
+        box-shadow: 5px 5px 0 var(--ink);
+        background: #fff7d4;
+        object-fit: cover;
+        object-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: none;
+        writing-mode: horizontal-tb;
+      }
+      .books > .book.spine-book .cover .stock-mask {
+        position: absolute;
+        top: 39.5%;
+        bottom: auto;
+        left: 0;
+        right: 0;
+        height: 21%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        writing-mode: horizontal-tb;
+        font-size: 12px;
+        border: 3px solid var(--ink);
+        padding: 3px;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 12mm;
+      }
+      @media print {
+        html,
+        body {
+          background: #fff !important;
+          color: #202020 !important;
+          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact;
+        }
+        .toolbar,
+        .config-bar,
+        .book-tools,
+        .edit-art,
+        .add-book,
+        .note,
+        .toast,
+        .hidden-input {
+          display: none !important;
+        }
+        .wrap {
+          max-width: none;
+          padding: 0;
+          margin: 0;
+        }
+        .site {
+          box-shadow: none;
+          border: 2px solid #202020;
+          overflow: visible;
+        }
+        .masthead {
+          padding: 18px 22px;
+        }
+        .masthead h1 {
+          font-size: 34px;
+        }
+        .content {
+          display: grid !important;
+          grid-template-columns: minmax(0, 1.18fr) minmax(0, 0.82fr) !important;
+        }
+        .comic-section {
+          border-right: 2px solid #202020 !important;
+          border-bottom: 0 !important;
+          padding: 15px;
+        }
+        .post-section {
+          padding: 15px;
+        }
+        .comic-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+          gap: 7px;
+        }
+        .panel {
+          min-height: 145px;
+          box-shadow: none;
+          break-inside: avoid;
+        }
+        .panel-art {
+          height: 85px;
+        }
+        .panel-caption {
+          font-size: 10px !important;
+          padding: 6px;
+        }
+        .post-section h2,
+        .comic-section h2 {
+          font-size: 20px;
+          margin: 10px 0;
+        }
+        .precepts li {
+          padding: 7px 0;
+          break-inside: avoid;
+        }
+        .precepts p {
+          font-size: 11px !important;
+        }
+        .precepts strong {
+          font-size: 12px;
+        }
+        .post-intro {
+          font-size: 12px !important;
+        }
+        .selection {
+          padding: 18px 22px;
+          break-before: auto;
+        }
+        .books {
+          grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+          gap: 12px;
+        }
+        .book {
+          break-inside: avoid;
+        }
+        .footer {
+          padding: 10px 20px;
+        }
+        .editing .editable {
+          outline: none !important;
+        }
+        a[data-link] {
+          color: #202020;
+        }
+      }
+      .pdf-format-control {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 13px;
+        font-weight: 800;
+        color: #202020;
+      }
+      .pdf-format-control select {
+        padding: 9px;
+        border: 2px solid #202020;
+        border-radius: 8px;
+        background: #fff;
+        color: #202020;
+        font-weight: 800;
+      }
+      @media print {
+        .site {
+          border: 3px solid #202020 !important;
+          box-shadow: 3mm 3mm 0 #242424 !important;
+        }
+        .wrap {
+          padding: 3mm 4mm 7mm 3mm !important;
+        }
+        .panel {
+          box-shadow: 2px 2px 0 #202020 !important;
+        }
+        .cover {
+          box-shadow: 3px 3px 0 #202020 !important;
+        }
+        .pdf-format-control {
+          display: none !important;
+        }
+      }
+
+      .comic-grid .panel {
+        display: flex;
+        flex-direction: column;
+      }
+      .comic-grid .panel-art {
+        flex: 1 1 auto;
+        height: auto;
+        min-height: 145px;
+      }
+      .comic-grid .panel-art img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .comic-grid .panel.caption-empty .panel-caption {
+        display: none !important;
+      }
+      .comic-grid .panel.caption-empty .panel-art {
+        min-height: 215px;
+      }
+      .comic-caption-edit {
+        display: none;
+        align-self: stretch;
+        margin: 6px;
+        padding: 7px 5px;
+        border: 2px solid #202020;
+        border-radius: 6px;
+        background: white !important;
+        color: #202020 !important;
+        -webkit-text-fill-color: #202020 !important;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .editing .comic-caption-edit {
+        display: block;
+      }
+      @media print {
+        .comic-caption-edit {
+          display: none !important;
+        }
+      }
+
+      .editor-controls {
+        margin-bottom: 24px;
+        padding: 20px;
+        background: #fffdf7;
+        border: 2px solid var(--ink);
+        border-radius: 16px;
+        box-shadow: 4px 4px 0 var(--ink);
+      }
+      .editor-heading {
+        margin-bottom: 18px;
+      }
+      .editor-heading strong {
+        font-size: 19px;
+      }
+      .editor-heading p {
+        margin: 6px 0 0;
+        font-size: 13px;
+        color: #555;
+      }
+      .editor-controls .toolbar {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        margin: 0;
+      }
+      .editor-controls .control-group {
+        min-width: 0;
+        padding-top: 14px;
+        border-top: 1px solid #dedbd2;
+      }
+      .editor-controls .control-group h2 {
+        font:
+          800 12px/1.3 Arial,
+          sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin: 0 0 12px;
+        color: #555;
+      }
+      .editor-controls .actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .editor-controls .btn {
+        min-height: 44px;
+        padding: 10px 14px;
+        font-size: 14px;
+        line-height: 1.3;
+        box-shadow: 2px 2px 0 var(--ink);
+      }
+      .editor-controls .reset-button {
+        margin-left: auto;
+        background: transparent !important;
+        box-shadow: none;
+        border-color: #bbb;
+        color: #684137 !important;
+        -webkit-text-fill-color: #684137 !important;
+      }
+      .editor-controls .control-group > p {
+        font-size: 12px;
+        margin: 10px 0 0;
+        color: #666;
+      }
+      .editor-controls .config-bar {
+        display: flex;
+        align-items: flex-end;
+        gap: 20px;
+        flex-wrap: wrap;
+        border: 0;
+        border-radius: 0;
+        padding: 0;
+        margin: 0;
+        background: transparent;
+      }
+      .editor-controls .font-control,
+      .editor-controls .size-control {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .editor-controls select {
+        min-height: 44px;
+        font-size: 14px;
+        max-width: 100%;
+      }
+      .editor-controls .size-control > span {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        min-height: 44px;
+      }
+      .editor-controls .size-control input {
+        width: 145px;
+      }
+      .editor-controls .color-controls {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      .editor-controls .color-controls label {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .editor-controls input[type="color"] {
+        width: 48px;
+        height: 44px;
+        padding: 4px;
+        border: 1px solid #aaa;
+        background: white;
+      }
+      .editor-controls .pdf-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-left: 16px;
+        border-left: 1px solid #dedbd2;
+      }
+      .editor-controls :is(button, select, input):focus-visible {
+        outline: 3px solid #1674b8;
+        outline-offset: 4px;
+      }
+      .editing .editable {
+        cursor: text;
+      }
+      .editing .editable:empty:before {
+        content: "✎";
+        opacity: 0.5;
+      }
+      @media (max-width: 600px) {
+        .editor-controls {
+          padding: 14px;
+        }
+        .editor-controls .actions {
+          width: 100%;
+          gap: 10px;
+        }
+        .editor-controls .actions > .btn {
+          flex: 1 1 auto;
+          white-space: normal;
+        }
+        .editor-controls .reset-button {
+          margin-left: 0;
+        }
+        .editor-controls .pdf-actions {
+          width: 100%;
+          padding: 12px 0 0;
+          border-left: 0;
+          border-top: 1px solid #dedbd2;
+        }
+        .editor-controls .pdf-actions .btn {
+          flex: 1;
+          white-space: normal;
+        }
+        .editor-controls .font-control {
+          width: 100%;
+        }
+        .editor-controls .font-control select {
+          width: 100%;
+        }
+        .editor-controls .color-controls {
+          gap: 18px;
+        }
+      }
+      @media print {
+        .editor-controls {
+          display: none !important;
+        }
+      }
+
+      /* Editing outlines must not change the shape of circular labels. */
+      .site.editing :is(.stamp, .panel-number, .precepts .n).editable {
+        border-radius: 50%;
+      }
+      .palette-controls {
+        border-top: 1px solid #dedbd2;
+        padding-top: 14px;
+      }
+      .palette-controls summary {
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .palette-controls p {
+        font-size: 12px;
+        color: #555;
+        line-height: 1.5;
+      }
+      .palette-fields {
+        display: flex;
+        align-items: flex-end;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .palette-fields label {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .palette-fields select {
+        max-width: 100%;
+        padding: 8px;
+        border: 2px solid var(--ink);
+        border-radius: 8px;
+        background: white;
+        color: #202020;
+      }
+      .palette-fields input:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+      @media (max-width: 600px) {
+        .palette-fields label:first-child {
+          width: 100%;
+        }
+      }
+      #site {
+        color: var(--theme-text, #202020);
+      }
+      #site .masthead {
+        color: var(--theme-header-text, #202020);
+      }
+      #site .masthead h1 {
+        color: var(--theme-title-text, #202020);
+      }
+      #site h2 {
+        color: var(--theme-heading-text, #202020);
+      }
+      #site .section-label {
+        color: var(--theme-label-text, #ffffff);
+        background: var(--theme-label-bg, #202020);
+      }
+      #site .stamp {
+        color: var(--theme-stamp-text, #202020);
+        background: var(--theme-stamp-bg, #ff9fa6);
+      }
+      #site .panel-number {
+        color: var(--theme-number-text, #202020);
+        background: var(--theme-number-bg, #ffda52);
+      }
+      #site .precepts .n {
+        color: var(--theme-bullet-text, #202020);
+        background: var(--theme-bullet-bg, #ff9fa6);
+      }
+      #site .panel {
+        background: var(--theme-panel-bg, #ffffff);
+      }
+      #site .panel:nth-child(3n + 2) {
+        background: var(--theme-panel2-bg, #fff1ce);
+      }
+      #site .panel:nth-child(3n) {
+        background: var(--theme-panel3-bg, #dff1ee);
+      }
+      #site .panel-caption {
+        color: var(--theme-caption-text, #202020);
+        background: var(--theme-caption-bg, transparent);
+      }
+      #site .selection {
+        color: var(--theme-selection-text, #202020);
+      }
+      #site .cover {
+        color: var(--theme-cover-text, #202020);
+        background: var(--theme-cover-bg, #fff7d4);
+      }
+      #site .book:nth-child(even) .cover {
+        background: var(--theme-cover2-bg, #d8e9e7);
+      }
+      #site .spine-book .cover :is(img, .fallback) {
+        background: var(--theme-spine-bg, #fff7d4);
+        color: var(--theme-spine-text, #202020);
+      }
+      #site .coming-soon .cover {
+        background: var(--theme-coming-bg, #fff9ee);
+        color: var(--theme-coming-text, #202020);
+      }
+      #site .stock-mask {
+        color: var(--theme-stock-text, #ffffff);
+        background: var(--theme-stock-bg, rgba(20, 20, 20, 0.72));
+      }
+      #site .book h3 {
+        color: var(--theme-book-title-text, #202020);
+      }
+      #site .book a {
+        color: var(--theme-link-text, #202020);
+      }
+      #site .footer {
+        color: var(--theme-footer-text, #202020);
+        background: var(--theme-footer-bg, #fffaf0);
+      }
+      #site,
+      #site
+        :is(
+          .masthead,
+          .comic-section,
+          .panel,
+          .panel-caption,
+          .panel-number,
+          .stamp,
+          .precepts .n,
+          .selection,
+          .cover,
+          .footer
+        ),
+      #site .spine-book .cover :is(img, .fallback, .stock-mask) {
+        border-color: var(--theme-border, #202020) !important;
+      }
+      #site .precepts li {
+        border-color: var(--theme-divider, #bdb8aa);
+      }
+      #site {
+        box-shadow: 10px 10px 0 var(--theme-shadow, #242424);
+      }
+      #site .panel {
+        box-shadow: 3px 3px 0 var(--theme-shadow, #202020) !important;
+      }
+      #site .cover,
+      #site .spine-book .cover :is(img, .fallback) {
+        box-shadow: 5px 5px 0 var(--theme-shadow, #202020) !important;
+      }
+      #site .spine-book .cover,
+      #site .coming-soon .cover {
+        box-shadow: none !important;
+      }
+      .sheet #site {
+        box-shadow: 9px 9px 0 var(--theme-shadow, #242424) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="editor-controls" aria-label="Configuration du blog">
+        <div class="editor-heading">
+          <strong>Votre blog, à votre façon</strong>
+          <p>Activez l’édition, puis cliquez sur un texte du blog pour le modifier.</p>
+        </div>
+        <div class="toolbar">
+          <section class="control-group" aria-labelledby="editHeading">
+            <h2 id="editHeading">1. Édition</h2>
+            <div class="actions">
+              <button class="btn primary" id="editBtn" type="button">✏️ Activer l’édition</button
+              ><button class="btn" id="saveBtn" type="button">💾 Enregistrer</button
+              ><button class="btn reset-button" id="resetBtn" type="button">↺ Réinitialiser</button>
+            </div>
+            <p>« Enregistrer » conserve vos changements dans ce navigateur.</p>
+          </section>
+          <section class="control-group appearance-group" aria-labelledby="appearanceHeading">
+            <h2 id="appearanceHeading">2. Apparence</h2>
+            <div class="config-bar">
+              <label class="font-control" for="fontSelect"
+                >Police globale
+                <select id="fontSelect" aria-label="Police d’écriture globale">
+                  <option value="dm">DM Sans (moderne)</option>
+                  <option value="comic">Comic Sans (BD)</option>
+                  <option value="marker">Permanent Marker</option>
+                  <option value="arial">Arial (classique)</option>
+                  <option value="georgia">Georgia (littéraire)</option>
+                  <option value="verdana">Verdana (lisible)</option>
+                  <option value="courier">Courier New (machine)</option>
+                </select></label
+              >
+              <label class="size-control"
+                >Taille du texte
+                <span
+                  ><input
+                    id="textSize"
+                    type="range"
+                    min="85"
+                    max="135"
+                    value="100"
+                    step="5"
+                  /><output id="sizeOutput" for="textSize">100 %</output></span
+                ></label
+              >
+              <div class="color-controls">
+                <label>Titre <input id="headerColor" type="color" value="#ffda52" /></label
+                ><label>Bandeau <input id="bandColor" type="color" value="#f9cbd0" /></label
+                ><label>Page <input id="paperColor" type="color" value="#fffaf0" /></label>
+              </div>
+            </div>
+          </section>
+          <details class="palette-controls">
+            <summary>Couleurs détaillées du blog</summary>
+            <p>
+              Choisissez un élément, puis sa couleur de texte ou de fond. Les contours et les ombres
+              se règlent pour tout le blog.
+            </p>
+            <div class="palette-fields">
+              <label
+                >Élément
+                <select id="paletteTarget"></select
+              ></label>
+              <label>Texte <input id="paletteText" type="color" /></label>
+              <label>Fond <input id="paletteBackground" type="color" disabled="" /></label>
+              <label>Contours <input id="paletteBorder" type="color" value="#202020" /></label>
+              <label>Ombres <input id="paletteShadow" type="color" value="#242424" /></label>
+            </div>
+          </details>
+          <section class="control-group export-group" aria-labelledby="exportHeading">
+            <h2 id="exportHeading">3. Export</h2>
+            <div class="actions">
+              <button class="btn" id="exportBtn" type="button">⬇️ Exporter le site HTML</button>
+              <div class="pdf-actions">
+                <label class="pdf-format-control" for="pdfFormat"
+                  >Format
+                  <select id="pdfFormat" aria-label="Format de papier PDF">
+                    <option>A1</option>
+                    <option>A2</option>
+                    <option>A3</option>
+                    <option selected="">A4</option>
+                    <option>A5</option>
+                  </select></label
+                ><button class="btn" id="pdfBtn" type="button">📄 Exporter en PDF</button>
+              </div>
+            </div>
+            <p>HTML modifiable ou PDF prêt à imprimer.</p>
+          </section>
+        </div>
+      </div>
+      <main class="site" id="site">
+        <header class="masthead" style="background: rgb(255, 218, 82)">
+          <div class="eyebrow editable">VOTRE BLOG · ÉDITION N° 01</div>
+          <h1 class="editable">Le titre de votre blog</h1>
+          <p class="editable">
+            Présentez ici votre univers, votre projet ou le thème de cette édition.
+          </p>
+          <div class="stamp editable">Votre<br />badge</div>
+        </header>
+        <div class="content">
+          <section class="comic-section">
+            <span class="section-label editable">VOTRE HISTOIRE EN IMAGES</span>
+            <h2 class="editable">Le titre de votre bande dessinée</h2>
+            <div class="comic-grid" id="comicGrid">
+              <div class="panel">
+                <span class="panel-number editable">1</span>
+                <div class="panel-art">
+                  <span class="placeholder editable">▧</span
+                  ><button class="edit-art" type="button">Changer l'image</button>
+                </div>
+                <div class="panel-caption editable">Légende de la case 1.</div>
+              </div>
+              <div class="panel">
+                <span class="panel-number editable">2</span>
+                <div class="panel-art">
+                  <span class="placeholder editable">▧</span
+                  ><button class="edit-art" type="button">Changer l'image</button>
+                </div>
+                <div class="panel-caption editable">Légende de la case 2.</div>
+              </div>
+              <div class="panel">
+                <span class="panel-number editable">3</span>
+                <div class="panel-art">
+                  <span class="placeholder editable">▧</span
+                  ><button class="edit-art" type="button">Changer l'image</button>
+                </div>
+                <div class="panel-caption editable">Légende de la case 3.</div>
+              </div>
+              <div class="panel">
+                <span class="panel-number editable">4</span>
+                <div class="panel-art">
+                  <span class="placeholder editable">▧</span
+                  ><button class="edit-art" type="button">Changer l'image</button>
+                </div>
+                <div class="panel-caption editable">Légende de la case 4.</div>
+              </div>
+              <div class="panel">
+                <span class="panel-number editable">5</span>
+                <div class="panel-art">
+                  <span class="placeholder editable">▧</span
+                  ><button class="edit-art" type="button">Changer l'image</button>
+                </div>
+                <div class="panel-caption editable">Légende de la case 5.</div>
+              </div>
+              <div class="panel">
+                <span class="panel-number editable">6</span>
+                <div class="panel-art">
+                  <span class="placeholder editable">▧</span
+                  ><button class="edit-art" type="button">Changer l'image</button>
+                </div>
+                <div class="panel-caption editable">Légende de la case 6.</div>
+              </div>
+            </div>
+            <p class="note">
+              En mode édition, clique sur « Changer l'image » pour remplacer chaque illustration par
+              ton dessin ou une photo.
+            </p>
+          </section>
+          <article class="post-section">
+            <span class="section-label editable">VOTRE ARTICLE</span>
+            <h2 class="editable">Le titre de votre article</h2>
+            <p class="post-intro editable">
+              Ajoutez une courte introduction pour présenter les dix points de votre article.
+            </p>
+            <ol class="precepts">
+              <li>
+                <span class="n editable">01</span>
+                <div>
+                  <strong class="editable">Titre du point 1</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+              <li>
+                <span class="n editable">02</span>
+                <div>
+                  <strong class="editable">Titre du point 2</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+              <li>
+                <span class="n editable">03</span>
+                <div>
+                  <strong class="editable">Titre du point 3</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+              <li>
+                <span class="n editable">04</span>
+                <div>
+                  <strong class="editable">Titre du point 4</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+              <li>
+                <span class="n editable">05</span>
+                <div>
+                  <strong class="editable">Titre du point 5</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+              <li>
+                <span class="n editable">06</span>
+                <div>
+                  <strong class="editable">Titre du point 6</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+              <li>
+                <span class="n editable">07</span>
+                <div>
+                  <strong class="editable">Titre du point 7</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+              <li>
+                <span class="n editable">08</span>
+                <div>
+                  <strong class="editable">Titre du point 8</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+              <li>
+                <span class="n editable">09</span>
+                <div>
+                  <strong class="editable">Titre du point 9</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+              <li>
+                <span class="n editable">10</span>
+                <div>
+                  <strong class="editable">Titre du point 10</strong>
+                  <p class="editable">Développez ici votre idée en quelques mots.</p>
+                </div>
+              </li>
+            </ol>
+          </article>
+        </div>
+        <section class="selection" style="background: rgb(249, 203, 208)">
+          <div class="selection-header">
+            <div>
+              <span class="section-label editable">VOTRE SÉLECTION</span>
+              <h2 class="editable">Vos recommandations de lecture</h2>
+              <p class="editable">Présentez ici les ouvrages que vous souhaitez partager.</p>
+            </div>
+            <button type="button" class="btn add-book" id="addBook">＋ Ajouter un livre</button>
+          </div>
+          <div class="books" id="books">
+            <div class="book">
+              <div class="cover">
+                <span class="fallback editable">Couverture 1</span
+                ><span class="stock-mask editable" hidden="">MENTION DE STOCK</span>
+              </div>
+              <h3 class="editable">Titre du livre 1</h3>
+              <a href="#" data-link="" class="editable">Découvrir le livre</a>
+              <div class="book-tools">
+                <button class="mini upload-cover" type="button">📷 Image</button
+                ><button class="mini edit-link" type="button">🔗 Lien</button
+                ><button class="mini toggle-stock" type="button">🚫 Rupture : ON/OFF</button
+                ><button class="mini edit-stock" type="button">
+                  ✍️ Modifier le texte de rupture</button
+                ><input
+                  class="stock-editor"
+                  type="text"
+                  aria-label="Texte de rupture de stock"
+                  placeholder="Ex. ÉPUISÉ"
+                /><button class="mini remove-book" type="button">✕ Retirer</button>
+              </div>
+            </div>
+            <div class="book">
+              <div class="cover">
+                <span class="fallback editable">Couverture 2</span
+                ><span class="stock-mask editable" hidden="">MENTION DE STOCK</span>
+              </div>
+              <h3 class="editable">Titre du livre 2</h3>
+              <a href="#" data-link="" class="editable">Découvrir le livre</a>
+              <div class="book-tools">
+                <button class="mini upload-cover" type="button">📷 Image</button
+                ><button class="mini edit-link" type="button">🔗 Lien</button
+                ><button class="mini toggle-stock" type="button">🚫 Rupture : ON/OFF</button
+                ><button class="mini edit-stock" type="button">
+                  ✍️ Modifier le texte de rupture</button
+                ><input
+                  class="stock-editor"
+                  type="text"
+                  aria-label="Texte de rupture de stock"
+                  placeholder="Ex. ÉPUISÉ"
+                /><button class="mini remove-book" type="button">✕ Retirer</button>
+              </div>
+            </div>
+            <div class="book spine-book">
+              <div class="cover">
+                <span class="fallback editable">Livre 3</span
+                ><span class="stock-mask editable" hidden="">MENTION DE STOCK</span>
+              </div>
+              <h3 class="editable">Titre du livre 3</h3>
+              <a href="#" data-link="" class="editable">Découvrir le livre</a>
+              <div class="book-tools">
+                <button class="mini upload-cover" type="button">📷 Image</button
+                ><button class="mini edit-link" type="button">🔗 Lien</button
+                ><button class="mini toggle-stock" type="button">🚫 Rupture : ON/OFF</button
+                ><button class="mini edit-stock" type="button">
+                  ✍️ Modifier le texte de rupture</button
+                ><input
+                  class="stock-editor"
+                  type="text"
+                  aria-label="Texte de rupture de stock"
+                  placeholder="Ex. ÉPUISÉ"
+                /><button class="mini remove-book" type="button">✕ Retirer</button>
+              </div>
+            </div>
+            <div class="book coming-soon">
+              <div class="cover"><span class="fallback editable">…</span></div>
+              <h3 class="editable">Plus à venir…</h3>
+            </div>
+          </div>
+        </section>
+        <footer class="footer">
+          <span class="editable">© Votre blog — Votre mention de droits.</span
+          ><span class="editable">Votre signature ou votre slogan.</span>
+        </footer>
+      </main>
+      <p class="note">
+        Pour les livres : clique sur « 📷 Image » pour importer une couverture, « 🚫 Rupture » pour
+        afficher/masquer le bandeau et « ✍️ Texte rupture » pour personnaliser son message. Le
+        troisième livre est couché à plat : sa longueur est égale à la hauteur des autres
+        couvertures. La quatrième place annonce « Plus à venir… ».
+      </p>
+      <p class="note">
+        Cliquez sur un texte pour le modifier. « Enregistrer » conserve les changements dans ce
+        navigateur ; « Exporter le site HTML » crée un fichier modifiable avec vos images intégrées.
+        Les polices Google nécessitent une connexion ; une police locale prend le relais hors
+        connexion.
+      </p>
+      <p class="note">
+        Blogomatik par MalaM :
+        <a href="https://github.com/Malamdg/blogomatik" target="_blank" rel="noopener noreferrer"
+          >https://github.com/Malamdg/blogomatik</a
+        >
+      </p>
+      <input class="hidden-input" type="file" id="imageInput" accept="image/*" />
+      <div class="toast" id="toast"></div>
+    </div>
+
+    <script id="blog-configurator">
+      (() => {
+        const storageKey = (name) => "blog-configurator:" + name + ":" + location.pathname;
+        function readSetting(name) {
+          try {
+            return localStorage.getItem(storageKey(name));
+          } catch (error) {
+            return null;
+          }
+        }
+        function readColors() {
+          try {
+            const colors = JSON.parse(readSetting("colors"));
+            return colors && typeof colors === "object" && !Array.isArray(colors) ? colors : null;
+          } catch (error) {
+            return null;
+          }
+        }
+        const site = document.getElementById("site"),
+          editBtn = document.getElementById("editBtn"),
+          saveBtn = document.getElementById("saveBtn"),
+          imageInput = document.getElementById("imageInput");
+        let editing = false,
+          target = null;
+        const initial = site.innerHTML;
+        const embedded = window.__BLOG_CONFIG__ || null;
+        const fontSelect = document.getElementById("fontSelect");
+        const fonts = {
+          dm: "'DM Sans',Arial,sans-serif",
+          comic: "'Comic Sans MS','Comic Sans',cursive",
+          marker: "'Permanent Marker','Comic Sans MS',cursive",
+          arial: "Arial,Helvetica,sans-serif",
+          georgia: "Georgia,serif",
+          verdana: "Verdana,Geneva,sans-serif",
+          courier: "'Courier New',monospace",
+        };
+        function applyFont(key) {
+          const chosen = fonts[key] ? key : "dm";
+          document.documentElement.style.setProperty("--global-font", fonts[chosen]);
+          fontSelect.value = chosen;
+          try {
+            localStorage.setItem(storageKey("font"), chosen);
+          } catch (e) {}
+        }
+        fontSelect.addEventListener("change", () => applyFont(fontSelect.value));
+        applyFont(readSetting("font") || embedded?.font || "dm");
+        function toast(t) {
+          const e = document.getElementById("toast");
+          e.textContent = t;
+          e.style.display = "block";
+          setTimeout(() => (e.style.display = "none"), 2500);
+        }
+        function mode(on) {
+          editing = on;
+          site.classList.toggle("editing", on);
+          site
+            .querySelectorAll(".editable")
+            .forEach((e) => (e.contentEditable = on ? "true" : "false"));
+          editBtn.textContent = on ? "✓ Terminer l’édition" : "✏️ Activer l’édition";
+          saveBtn.textContent = "💾 Enregistrer";
+        }
+        editBtn.onclick = () => mode(!editing);
+        function snapshot() {
+          const clone = site.cloneNode(true);
+          clone.classList.remove("editing");
+          clone
+            .querySelectorAll("[contenteditable]")
+            .forEach((e) => e.removeAttribute("contenteditable"));
+          return clone.innerHTML;
+        }
+        function store() {
+          try {
+            localStorage.setItem(storageKey("content"), snapshot());
+            toast("Modifications enregistrées dans ce navigateur.");
+          } catch (e) {
+            toast(
+              "Enregistrement local impossible. Exportez le HTML pour conserver vos modifications.",
+            );
+          }
+        }
+        function exportHTML() {
+          const clone = document.documentElement.cloneNode(true);
+          const copySite = clone.querySelector("#site");
+          copySite.innerHTML = snapshot();
+          copySite.classList.remove("editing");
+          clone.querySelector("#fontSelect").value = fontSelect.value;
+          const config = {
+            content: snapshot(),
+            font: fontSelect.value,
+            header: document.getElementById("headerColor").value,
+            band: document.getElementById("bandColor").value,
+            paper: document.getElementById("paperColor").value,
+            size: document.getElementById("textSize").value,
+          };
+          clone.querySelectorAll("script[data-blog-config]").forEach((script) => script.remove());
+          const boot = clone.ownerDocument.createElement("script");
+          boot.dataset.blogConfig = "";
+          boot.textContent =
+            "window.__BLOG_CONFIG__=" + JSON.stringify(config).replace(/</g, "\\u003c") + ";";
+          clone.querySelector("head").appendChild(boot);
+          clone.querySelectorAll(".editable").forEach((e) => e.removeAttribute("contenteditable"));
+          const html = "<!DOCTYPE html>\n" + clone.outerHTML;
+          const blob = new Blob([html], { type: "text/html;charset=utf-8" }),
+            url = URL.createObjectURL(blob),
+            a = document.createElement("a");
+          a.href = url;
+          a.download = "mon-blog.html";
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(url), 2000);
+          toast("Fichier HTML exporté.");
+        }
+        document.getElementById("pdfBtn").onclick = () => {
+          if (document.activeElement?.blur) document.activeElement.blur();
+          const sizes = {
+            A1: [594, 841],
+            A2: [420, 594],
+            A3: [297, 420],
+            A4: [210, 297],
+            A5: [148, 210],
+          };
+          const format = document.getElementById("pdfFormat").value;
+          const [pw, ph] = sizes[format] || sizes.A4;
+          const copy = site.cloneNode(true);
+          copy.classList.remove("editing");
+          copy
+            .querySelectorAll("[contenteditable]")
+            .forEach((el) => el.removeAttribute("contenteditable"));
+          copy
+            .querySelectorAll(
+              ".book-tools,.edit-art,.add-book,.stock-editor,.note,.comic-caption-edit",
+            )
+            .forEach((el) => el.remove());
+          // Keep the visual theme, but isolate paper layout from legacy print and mobile rules.
+          const css = [...document.querySelectorAll("style")]
+            .flatMap((el) => [...el.sheet.cssRules])
+            .filter((rule) => rule.type !== CSSRule.MEDIA_RULE && rule.type !== CSSRule.PAGE_RULE)
+            .map((rule) => rule.cssText)
+            .join("\n");
+          const printCSS = `
+  @page{size:${pw}mm ${ph}mm;margin:0}
+  html,body{margin:0!important;padding:0!important;background:white!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .sheet{width:${pw}mm;height:${ph}mm;position:relative;overflow:hidden;background:white;break-after:avoid;page-break-after:avoid}
+  .sheet .wrap{position:absolute!important;left:0;top:0;width:1000px;max-width:none!important;margin:0!important;padding:0 9px 9px 0!important;transform-origin:top left!important;box-sizing:border-box!important}
+  .sheet .site{width:100%!important;border:3px solid #202020!important;box-shadow:9px 9px 0 #242424!important;overflow:visible!important}
+  .sheet .content{display:grid!important;grid-template-columns:minmax(0,1.18fr) minmax(0,.82fr)!important}
+  .sheet .comic-section{border-right:3px solid #202020!important;border-bottom:0!important}
+  .sheet .comic-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .sheet .books{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+  .sheet .panel{border:3px solid #202020!important;box-shadow:3px 3px 0 #202020!important}
+  .sheet .cover{box-shadow:5px 5px 0 #202020}
+  .sheet .toolbar,.sheet .config-bar,.sheet .edit-art,.sheet .book-tools,.sheet .add-book,.sheet .note,.sheet .comic-caption-edit,.sheet .stock-editor{display:none!important}
+  .sheet .editable{outline:none!important}
+  .sheet .masthead{padding:20px 24px!important}
+  .sheet .masthead h1{font-size:2.625em!important;margin:8px 100px 9px 0!important}
+  .sheet .masthead p{max-width:calc(100% - 100px)}
+  .sheet .stamp{position:absolute;right:22px;top:24px;width:76px;height:76px;font-size:12px;margin:0}
+  .sheet h2{font-size:1.5em;margin:14px 0 16px}
+  .sheet .comic-section,.sheet .post-section{padding:18px!important;min-width:0}
+  .sheet .comic-section{display:flex;flex-direction:column}
+  .sheet .comic-section>.section-label{align-self:flex-start}
+  .sheet .comic-grid{flex:1;grid-template-rows:repeat(2,minmax(180px,1fr));gap:12px}
+  .sheet .panel{min-height:180px!important}
+  .sheet .panel-art{height:0;min-height:110px;flex:1 1 0}
+  .sheet .panel-art img{position:absolute;inset:0}
+  .sheet .panel-caption{flex:0 0 auto;font-size:.85em!important;padding:9px}
+  .sheet .comic-grid .panel.caption-empty .panel-art{min-height:180px}
+  .sheet .placeholder{font-size:56px}
+  .sheet .post-intro{font-size:.95em;line-height:1.45;margin-bottom:12px}
+  .sheet .precepts li{padding:6px 0;grid-template-columns:34px 1fr;gap:8px}
+  .sheet .precepts .n{width:30px;height:30px;font-size:.85em}
+  .sheet .precepts strong{font-size:.9em}
+  .sheet .precepts p{font-size:.85em;line-height:1.4}
+  .sheet .selection{padding:18px 24px 20px}
+  .sheet .selection h2{margin:12px 0 4px}
+  .sheet .selection p{margin-bottom:16px}
+  .sheet .books{grid-template-columns:1fr 1fr 1.333333fr 1fr!important;gap:16px;align-items:start}
+  .sheet .books>.book.spine-book .cover{aspect-ratio:1;box-shadow:none!important}
+  .sheet .cover .fallback{font-size:20px}
+  .sheet .coming-soon .cover .fallback{font-size:52px}
+  .sheet .stock-mask{font-size:.85em}
+  .sheet .footer{padding:10px 24px}
+  .sheet .site{font-size:var(--base-size,100%)!important}
+  @media print{.sheet{width:${pw}mm!important;height:${ph}mm!important}}
+  `;
+          const cfg = getComputedStyle(site);
+          const font =
+            cfg.getPropertyValue("--global-font") || getComputedStyle(document.body).fontFamily;
+          const size = cfg.getPropertyValue("--base-size") || "100%";
+          const js = `
+  function fit(){
+    const sheet=document.querySelector('.sheet'),wrap=sheet.querySelector('.wrap');
+    wrap.style.transform='none';
+    const rect=sheet.getBoundingClientRect();
+    const margin=4*96/25.4;
+    const availableW=rect.width-2*margin,availableH=rect.height-2*margin;
+    // Find a layout with the paper's useful aspect ratio before scaling it.
+    // Fixed typography and no viewport queries keep measurements stable in print.
+    let low=720,high=2400;
+    for(let i=0;i<18;i++){
+      const width=(low+high)/2;
+      wrap.style.width=width+'px';
+      if(wrap.getBoundingClientRect().height/width>availableH/availableW)low=width;
+      else high=width;
+    }
+    wrap.style.width=high+'px';
+    const bounds=wrap.getBoundingClientRect(),w=bounds.width,h=bounds.height;
+    const scale=Math.min(availableW/w,availableH/h);
+    wrap.style.transform='scale('+scale+')';
+    wrap.style.left=(margin+(availableW-w*scale)/2)+'px';
+    wrap.style.top=(margin+(availableH-h*scale)/2)+'px';
+    window.__printFit={scale:scale,sheetW:sheet.clientWidth,sheetH:sheet.clientHeight,contentW:w*scale,contentH:h*scale,left:parseFloat(wrap.style.left),top:parseFloat(wrap.style.top)};
+  }
+  window.addEventListener('load',async()=>{
+    try{await document.fonts.ready}catch(e){}
+    await Promise.all([...document.images].map(im=>im.complete?Promise.resolve():new Promise(resolve=>{im.onload=resolve;im.onerror=resolve})));
+    fit();window.__printReady=true;
+    setTimeout(()=>window.print(),500);
+  });
+  window.addEventListener('beforeprint',fit);
+  `;
+          const html =
+            '<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Blog — ' +
+            format +
+            " portrait</title><style>" +
+            css +
+            "\n:root{--global-font:" +
+            font +
+            ";--base-size:" +
+            size +
+            "}" +
+            printCSS +
+            '</style></head><body><div class="sheet"><div class="wrap">' +
+            copy.outerHTML +
+            "</div></div><scr" +
+            "ipt>" +
+            js +
+            "</scr" +
+            "ipt></body></html>";
+          const win = window.open("", "_blank");
+          if (!win) {
+            toast("Autorise les fenêtres pop-up pour exporter en PDF.");
+            return;
+          }
+          win.document.open();
+          win.document.write(html);
+          win.document.close();
+          toast("Aperçu ouvert : choisis « Enregistrer au format PDF ».");
+        };
+        saveBtn.onclick = store;
+        document.getElementById("exportBtn").onclick = exportHTML;
+        document.getElementById("resetBtn").onclick = () => {
+          if (!confirm("Remettre la maquette initiale ?")) return;
+          try {
+            ["content", "font", "colors"].forEach((name) =>
+              localStorage.removeItem(storageKey(name)),
+            );
+          } catch (error) {}
+          applyFont("dm");
+          site.innerHTML = initial;
+          ensureComingSoonLast();
+          applyColors({ header: "#ffda52", band: "#f9cbd0", paper: "#fffaf0", size: 100 });
+          mode(true);
+          toast("Maquette réinitialisée.");
+        };
+        try {
+          const saved = readSetting("content");
+          if (saved) site.innerHTML = saved;
+          else if (embedded?.content) site.innerHTML = embedded.content;
+        } catch (e) {}
+        mode(true);
+        function applyColors(c) {
+          const fields = {
+            header: "headerColor",
+            band: "bandColor",
+            paper: "paperColor",
+            size: "textSize",
+          };
+          for (const [k, id] of Object.entries(fields)) {
+            if (c[k] !== undefined) document.getElementById(id).value = c[k];
+          }
+          site.querySelector(".masthead").style.background =
+            document.getElementById("headerColor").value;
+          site.querySelector(".selection").style.background =
+            document.getElementById("bandColor").value;
+          site.style.background = document.getElementById("paperColor").value;
+          site.style.setProperty("--base-size", document.getElementById("textSize").value + "%");
+          document.getElementById("sizeOutput").textContent =
+            document.getElementById("textSize").value + " %";
+        }
+        const colors = readColors() || embedded || {};
+        applyColors(colors);
+        ["headerColor", "bandColor", "paperColor", "textSize"].forEach((id) =>
+          document.getElementById(id).addEventListener("input", () => {
+            applyColors({});
+            try {
+              localStorage.setItem(
+                storageKey("colors"),
+                JSON.stringify({
+                  header: document.getElementById("headerColor").value,
+                  band: document.getElementById("bandColor").value,
+                  paper: document.getElementById("paperColor").value,
+                  size: document.getElementById("textSize").value,
+                }),
+              );
+            } catch (e) {}
+          }),
+        );
+        function ensureComingSoonLast() {
+          const books = document.getElementById("books");
+          const coming = books?.querySelector(".coming-soon");
+          if (coming && coming !== books.lastElementChild) books.append(coming);
+        }
+        ensureComingSoonLast();
+        site.addEventListener("click", (e) => {
+          if (!editing) return;
+          const change = e.target.closest(".edit-art,.upload-cover");
+          if (change) {
+            target =
+              change.closest(".panel-art") || change.closest(".book")?.querySelector(".cover");
+            if (!target) {
+              toast("Emplacement image introuvable.");
+              return;
+            }
+            imageInput.value = "";
+            imageInput.click();
+            return;
+          }
+          const stockToggle = e.target.closest(".toggle-stock");
+          if (stockToggle) {
+            const mask = stockToggle.closest(".book").querySelector(".stock-mask");
+            if (mask) {
+              mask.hidden = !mask.hidden;
+              toast(mask.hidden ? "Masque retiré" : "Masque rupture affiché");
+            }
+            return;
+          }
+          const stockEdit = e.target.closest(".edit-stock");
+          if (stockEdit) {
+            const book = stockEdit.closest(".book"),
+              mask = book.querySelector(".stock-mask"),
+              field = book.querySelector(".stock-editor");
+            if (mask && field) {
+              field.value = mask.textContent;
+              field.classList.toggle("open");
+              if (field.classList.contains("open")) {
+                field.focus();
+                field.select();
+              }
+            }
+            return;
+          }
+          const coverClick = e.target.closest(".cover");
+          if (coverClick && !coverClick.closest(".coming-soon")) {
+            target = coverClick;
+            imageInput.click();
+            return;
+          }
+          const link = e.target.closest(".edit-link");
+          if (link) {
+            const a = link.closest(".book").querySelector("[data-link]"),
+              v = prompt(
+                "URL du livre (https://...)",
+                a.getAttribute("href") === "#" ? "" : a.getAttribute("href"),
+              );
+            if (v !== null) {
+              if (v.trim() && !/^https?:\/\//i.test(v.trim()))
+                return alert("Utilise un lien commençant par https:// ou http://");
+              a.href = v.trim() || "#";
+              a.textContent = v.trim() ? "Voir le livre ↗" : "Lien vers le livre";
+            }
+            return;
+          }
+          const remove = e.target.closest(".remove-book");
+          if (remove) {
+            e.preventDefault();
+            e.stopPropagation();
+            const book = remove.closest(".book");
+            if (book && !book.classList.contains("coming-soon")) {
+              book.remove();
+              ensureComingSoonLast();
+              toast("Livre retiré.");
+            }
+            return;
+          }
+        });
+        site.addEventListener("input", (e) => {
+          if (e.target.matches(".stock-editor")) {
+            const mask = e.target.closest(".book").querySelector(".stock-mask");
+            if (mask) {
+              mask.textContent = e.target.value || "RUPTURE DE STOCK";
+              mask.hidden = false;
+            }
+          }
+        });
+        imageInput.onchange = () => {
+          const file = imageInput.files[0];
+          if (!file || !target) return;
+          if (!file.type.startsWith("image/")) {
+            alert("Choisis une image (JPG, PNG, WebP ou GIF).");
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = () => {
+            target.querySelectorAll("img,.placeholder,.fallback").forEach((e) => e.remove());
+            const img = document.createElement("img");
+            img.src = reader.result;
+            img.alt = "Illustration personnalisée";
+            target.prepend(img);
+            toast("Image ajoutée !");
+            imageInput.value = "";
+          };
+          reader.onerror = () => toast("Impossible de lire cette image.");
+          reader.readAsDataURL(file);
+        };
+        document.getElementById("addBook").onclick = () => {
+          if (!editing) return;
+          const b = document.createElement("div");
+          b.className = "book";
+          b.innerHTML =
+            '<div class="cover"><span class="fallback editable" contenteditable="true">NOUVELLE<br>LECTURE</span><span class="stock-mask" hidden>RUPTURE DE STOCK</span></div><h3 class="editable" contenteditable="true">Titre du livre</h3><a href="#" data-link>Lien vers le livre</a><div class="book-tools"><button class="mini upload-cover" type="button">📷 Image</button><button class="mini edit-link" type="button">🔗 Lien</button><button class="mini toggle-stock" type="button">🚫 Rupture : ON/OFF</button><button class="mini edit-stock" type="button">✍️ Modifier le texte de rupture</button><input class="stock-editor" type="text" aria-label="Texte de rupture de stock" placeholder="Ex. ÉPUISÉ"><button class="mini remove-book" type="button">✕ Retirer</button></div>';
+          const books = document.getElementById("books");
+          const coming = books.querySelector(".coming-soon");
+          if (coming) books.insertBefore(b, coming);
+          else books.append(b);
+          ensureComingSoonLast();
+          toast("Livre ajouté avant « Plus à venir ».");
+        };
+        document.addEventListener("click", (e) => {
+          const a = e.target.closest("a[data-link]");
+          if (a && a.getAttribute("href") === "#") e.preventDefault();
+        });
+      })();
+    </script>
+    <script id="comic-caption-editor">
+      (() => {
+        const site = document.getElementById("site");
+        if (!site) return;
+        function refresh() {
+          site.querySelectorAll(".comic-grid .panel").forEach((panel, index) => {
+            const caption = panel.querySelector(".panel-caption");
+            if (!caption) return;
+            panel.classList.toggle("caption-empty", !caption.textContent.trim());
+            if (!panel.querySelector(".comic-caption-edit")) {
+              const button = document.createElement("button");
+              button.type = "button";
+              button.className = "comic-caption-edit";
+              button.textContent = "✏️ Modifier le texte";
+              button.setAttribute("aria-label", "Modifier le texte de la case " + (index + 1));
+              panel.appendChild(button);
+            }
+          });
+        }
+        site.addEventListener("click", (event) => {
+          const button = event.target.closest(".comic-caption-edit");
+          if (!button || !site.classList.contains("editing")) return;
+          event.preventDefault();
+          const caption = button.closest(".panel").querySelector(".panel-caption");
+          const answer = prompt(
+            "Texte de cette case (laisser vide pour agrandir l’image) :",
+            caption.textContent,
+          );
+          if (answer === null) return;
+          caption.textContent = answer;
+          refresh();
+        });
+        site.addEventListener("input", (event) => {
+          if (event.target.matches(".panel-caption")) refresh();
+        });
+        // Refresh after restoring saved content or resetting the template.
+        const observer = new MutationObserver(() => refresh());
+        observer.observe(site, { childList: true });
+        refresh();
+      })();
+    </script>
+    <script id="text-editor">
+      (() => {
+        const site = document.getElementById("site");
+        // Include decorative text and links, including content restored from older exports.
+        const textSelectors =
+          ".editable,.stamp,.section-label,.panel-number,.placeholder,.precepts .n,.cover .fallback,.stock-mask,.book [data-link]";
+        function refresh() {
+          const enabled = site.classList.contains("editing") ? "true" : "false";
+          site.querySelectorAll(textSelectors).forEach((element) => {
+            if (!element.classList.contains("editable")) element.classList.add("editable");
+            if (element.getAttribute("contenteditable") !== enabled)
+              element.setAttribute("contenteditable", enabled);
+          });
+        }
+        // Editing cover text must not open the image picker; editing link text must not navigate.
+        site.addEventListener(
+          "click",
+          (event) => {
+            if (!site.classList.contains("editing")) return;
+            const editable = event.target.closest(".editable");
+            if (editable?.closest(".cover") || editable?.matches("a")) {
+              if (editable.matches("a")) event.preventDefault();
+              event.stopPropagation();
+              editable.focus();
+            }
+          },
+          true,
+        );
+        const observer = new MutationObserver(refresh);
+        observer.observe(site, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ["class"],
+        });
+        refresh();
+      })();
+    </script>
+    <script id="palette-editor">
+      (() => {
+        const site = document.getElementById("site");
+        const target = document.getElementById("paletteTarget");
+        const text = document.getElementById("paletteText"),
+          background = document.getElementById("paletteBackground");
+        // Entries map visible controls to inherited variables carried by the site clone.
+        const groups = [
+          ["body", "Texte général", "text", "#202020", null],
+          ["header", "En-tête : texte secondaire", "header-text", "#202020", null],
+          ["title", "Titre principal", "title-text", "#202020", null],
+          ["heading", "Titres de section", "heading-text", "#202020", null],
+          ["label", "Bandeaux des rubriques", "label-text", "#ffffff", "label-bg", "#202020"],
+          ["stamp", "Badge de l’en-tête", "stamp-text", "#202020", "stamp-bg", "#ff9fa6"],
+          ["number", "Numéros des cases", "number-text", "#202020", "number-bg", "#ffda52"],
+          [
+            "bullet",
+            "Numéros des points de l’article",
+            "bullet-text",
+            "#202020",
+            "bullet-bg",
+            "#ff9fa6",
+          ],
+          ["panel", "Cases 1 et 4 : fond", null, null, "panel-bg", "#ffffff"],
+          ["panel2", "Cases 2 et 5 : fond", null, null, "panel2-bg", "#fff1ce"],
+          ["panel3", "Cases 3 et 6 : fond", null, null, "panel3-bg", "#dff1ee"],
+          ["caption", "Légendes des cases", "caption-text", "#202020", "caption-bg", "#ffffff"],
+          ["selection", "Présentation de la sélection", "selection-text", "#202020", null],
+          [
+            "cover",
+            "Couvertures : texte et fond impair",
+            "cover-text",
+            "#202020",
+            "cover-bg",
+            "#fff7d4",
+          ],
+          ["cover2", "Couvertures : fond pair", null, null, "cover2-bg", "#d8e9e7"],
+          ["spine", "Livre couché", "spine-text", "#202020", "spine-bg", "#fff7d4"],
+          [
+            "coming",
+            "Emplacement « Plus à venir »",
+            "coming-text",
+            "#202020",
+            "coming-bg",
+            "#fff9ee",
+          ],
+          ["stock", "Mentions de stock", "stock-text", "#ffffff", "stock-bg", "#141414"],
+          ["book-title", "Titres des livres", "book-title-text", "#202020", null],
+          ["link", "Liens des livres", "link-text", "#202020", null],
+          ["footer", "Pied de page", "footer-text", "#202020", "footer-bg", "#fffaf0"],
+          ["divider", "Séparateurs des points de l’article", null, null, "divider", "#bdb8aa"],
+        ];
+        const allowed = new Set([
+          "border",
+          "shadow",
+          ...groups.flatMap((g) => [g[2], g[4]]).filter(Boolean),
+        ]);
+        const storageKey = "blog-configurator:palette:" + location.pathname;
+        const valid = (value) => /^#[0-9a-f]{6}$/i.test(value);
+        function value(key, fallback) {
+          return site.style.getPropertyValue("--theme-" + key).trim() || fallback;
+        }
+        function save() {
+          const colors = {};
+          allowed.forEach((key) => {
+            const color = value(key, "");
+            if (valid(color)) colors[key] = color;
+          });
+          try {
+            localStorage.setItem(storageKey, JSON.stringify(colors));
+          } catch (e) {}
+        }
+        // Restore changes for this file; an export also carries its own inline palette.
+        try {
+          const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+          Object.entries(saved).forEach(([key, color]) => {
+            if (allowed.has(key) && valid(color)) site.style.setProperty("--theme-" + key, color);
+          });
+        } catch (e) {}
+        target.replaceChildren();
+        groups.forEach((group) => target.add(new Option(group[1], group[0])));
+        function refresh() {
+          const group = groups.find((g) => g[0] === target.value);
+          text.disabled = !group[2];
+          background.disabled = !group[4];
+          text.value = group[2] ? value(group[2], group[3]) : "#202020";
+          background.value = group[4] ? value(group[4], group[5]) : "#ffffff";
+          document.getElementById("paletteBorder").value = value("border", "#202020");
+          document.getElementById("paletteShadow").value = value("shadow", "#242424");
+        }
+        target.addEventListener("change", refresh);
+        [
+          [text, 2],
+          [background, 4],
+        ].forEach(([input, index]) =>
+          input.addEventListener("input", () => {
+            const key = groups.find((g) => g[0] === target.value)[index];
+            if (key) {
+              site.style.setProperty("--theme-" + key, input.value);
+              save();
+            }
+          }),
+        );
+        [
+          ["paletteBorder", "border"],
+          ["paletteShadow", "shadow"],
+        ].forEach(([id, key]) =>
+          document.getElementById(id).addEventListener("input", (event) => {
+            site.style.setProperty("--theme-" + key, event.target.value);
+            save();
+          }),
+        );
+        document.getElementById("saveBtn").addEventListener("click", save);
+        const reset = document.getElementById("resetBtn"),
+          originalReset = reset.onclick;
+        reset.onclick = () => {
+          const previous = site.firstElementChild;
+          originalReset();
+          if (previous !== site.firstElementChild) {
+            allowed.forEach((key) => site.style.removeProperty("--theme-" + key));
+            try {
+              localStorage.removeItem(storageKey);
+            } catch (e) {}
+            refresh();
+          }
+        };
+        refresh();
+      })();
+    </script>
+  </body>
+</html>
